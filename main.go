@@ -90,6 +90,8 @@ func main() {
 			return
 		}
 	}})
+
+	go initTray()
 	if err := hotKeyLoop(); err != nil {
 		panic(err)
 	}
