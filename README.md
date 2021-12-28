@@ -34,13 +34,12 @@ only using hotkeys:
 With Go 1.17+ installed, run:
 
 ```sh
-go install github.com/ahmetb/RectangleWin@latest
+go install -ldflags -H=windowsgui github.com/ahmetb/RectangleWin@latest
 ```
 
 The binary will be available in your `%USERPROFILE%\go\bin` directory
-(which you can add to your `%PATH%` if it's not there).
-
-For now, you have to keep the process running to be able to use it.
+(which you can add to your `%PATH%` if it's not there). Launch it, and it will
+be present on the System Tray as an icon (it does not launch on startup yet).
 
 ## Why?
 
@@ -51,9 +50,11 @@ Rectangle.app does, so I wrote this small utility for myself.
 
 ## Roadmap
 
-- System tray (+running without a cmd window i.e. `"-H=windowsgui"`)
+- Running without a cmd window i.e. `"-H=windowsgui"`.
 
 - Run on startup.
+
+- Set .exe icon with embedded string.
 
 - Configurable shortcuts: I don't need these and it will likely require a pop-up
   UI, so I will probably not get to this.
