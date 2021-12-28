@@ -3,9 +3,8 @@ package main
 import (
 	"fmt"
 
-	"github.com/gonutz/w32/v2"
-
 	"github.com/ahmetb/RectangleWin/w32ex"
+	"github.com/gonutz/w32/v2"
 )
 
 var (
@@ -39,7 +38,6 @@ func RegisterHotKey(h HotKey) {
 func startHotKeyListen() error {
 	for {
 		var m w32.MSG
-		fmt.Println("waiting for hotkey...")
 		if c := w32.GetMessage(&m, 0, w32.WM_HOTKEY, w32.WM_HOTKEY); c <= 0 {
 			return fmt.Errorf("GetMessage failed: %d", c)
 		}
@@ -49,6 +47,5 @@ func startHotKeyListen() error {
 		}
 		fmt.Printf("trace: hotkey id=%d (%s)\n", m.WParam, h)
 		h.callback()
-		fmt.Println("hotkey processed")
 	}
 }

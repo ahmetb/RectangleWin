@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"runtime"
 
 	"github.com/gonutz/w32/v2"
 
@@ -13,6 +14,7 @@ import (
 var lastResized w32.HWND
 
 func main() {
+	runtime.LockOSThread() // since we bind hotkeys etc that need to dispatch their message here
 	edgeFuncs := [][]resizeFunc{
 		{leftHalf, leftTwoThirds, leftOneThirds},
 		{rightHalf, rightTwoThirds, rightOneThirds},
