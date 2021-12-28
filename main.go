@@ -39,6 +39,12 @@ func main() {
 		panic("failed to set DPI aware")
 	}
 
+	autorun, err := AutoRunEnabled()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("autorun enabled=%v\n", autorun)
+
 	edgeFuncs := [][]resizeFunc{
 		{leftHalf, leftTwoThirds, leftOneThirds},
 		{rightHalf, rightTwoThirds, rightOneThirds},
