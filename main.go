@@ -17,9 +17,12 @@ package main
 import (
 	"errors"
 	"fmt"
+	"os"
+	"os/signal"
 	"reflect"
 	"runtime"
 
+	"github.com/getlantern/systray"
 	"github.com/gonutz/w32/v2"
 
 	"github.com/ahmetb/RectangleWin/w32ex"
@@ -91,8 +94,20 @@ func main() {
 		}
 	}})
 
-	go initTray()
-	if err := hotKeyLoop(); err != nil {
+	exitCh := make(chan os.Signal)
+	signal.Notify(exitCh, os.Interrupt)
+	go func() {
+		<-exitCh
+		fmt.Println("exit signal received")
+		systray.Quit() // causes WM_CLOSE, WM_QUIT, not sure if a side-effect
+	}()
+
+	// TODO systray/systray.go already locks the OS thread in init()
+	// however it's not clear if GetMessage(0,0) will continue to work
+	// as we run "go initTray()" and not pin the thread that initializes the
+	// tray.
+	initTray()
+	if err := msgLoop(); err != nil {
 		panic(err)
 	}
 }

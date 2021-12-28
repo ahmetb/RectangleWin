@@ -2,6 +2,7 @@ package main
 
 import (
 	_ "embed"
+	"fmt"
 
 	"github.com/getlantern/systray"
 )
@@ -10,7 +11,7 @@ import (
 var icon []byte
 
 func initTray() {
-	systray.Run(onReady, onExit)
+	systray.Register(onReady, onExit)
 }
 
 func onReady() {
@@ -18,9 +19,15 @@ func onReady() {
 	systray.SetTitle("RectangleWin")
 	systray.SetTooltip("RectangleWin")
 	mQuit := systray.AddMenuItem("Quit", "Quit the whole app")
-
 	mQuit.SetIcon(icon)
+	go func() {
+		<-mQuit.ClickedCh
+		fmt.Println("clicked Quit")
+		systray.Quit()
+	}()
+	fmt.Println("tray ready")
 }
 
 func onExit() {
+	fmt.Println("onExit invoked")
 }
