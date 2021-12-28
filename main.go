@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"syscall"
+	"unsafe"
 
 	"github.com/gonutz/w32/v2"
 	"golang.org/x/sys/windows"
@@ -125,9 +127,14 @@ func bottomTwoThirds(disp w32.RECT) w32.RECT { return toBottom(disp, 2, 3) }
 
 func resize(hand w32.HWND, f resizeFunc) (bool, error) {
 	rect := w32.GetWindowRect(hand)
+	proc := GetWindowModuleFileName(hand)
 	title := w32.GetWindowText(hand)
-	if title == "Program Manager" {
-		return false, errors.New("foreground window is ProgMan")
+	fmt.Printf("> title:%s\n", title)
+	fmt.Printf(">  proc:%s\n", proc)
+
+	if proc == "" {
+		fmt.Println("warn: system process resize?")
+		return false, nil
 	}
 
 	mon := w32.MonitorFromWindow(hand, w32.MONITOR_DEFAULTTONULL)
@@ -146,7 +153,7 @@ func resize(hand w32.HWND, f resizeFunc) (bool, error) {
 	}
 	resizedFrame := resizeForDpi(frame, int32(windowDPI), int32(monDPI))
 
-	fmt.Printf("> window:        %#v (w:%d,h:%d) mon=0x%X(@ DPI:%d)\n", rect, rect.Width(), rect.Height(), mon, monDPI)
+	fmt.Printf("> window: 0x%x       %#v (w:%d,h:%d) mon=0x%X(@ DPI:%d)\n", hand, rect, rect.Width(), rect.Height(), mon, monDPI)
 	fmt.Printf("> DWM frame:     %#v (W:%d,H:%d) @ DPI=%v\n", frame, frame.Width(), frame.Height(), windowDPI)
 	fmt.Printf("> DPI-less frame: %#v (W:%d,H:%d)\n", resizedFrame, resizedFrame.Width(), resizedFrame.Height())
 
@@ -205,6 +212,19 @@ func resizeForDpi(src w32.RECT, from, to int32) w32.RECT {
 func GetDpiForWindow(hwnd w32.HWND) int32 {
 	r1, _, _ := user32.NewProc("GetDpiForWindow").Call(uintptr(hwnd))
 	return int32(r1)
+}
+
+func GetWindowModuleFileName(hwnd w32.HWND) string {
+	var path [32768]uint16
+	ret, _, _ := user32.NewProc("GetWindowModuleFileNameW").Call(
+		uintptr(hwnd),
+		uintptr(unsafe.Pointer(&path[0])),
+		uintptr(len(path)),
+	)
+	if ret == 0 {
+		return ""
+	}
+	return syscall.UTF16ToString(path[:])
 }
 
 func sameRect(a, b *w32.RECT) bool {
