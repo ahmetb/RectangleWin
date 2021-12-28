@@ -50,8 +50,6 @@ Rectangle.app does, so I wrote this small utility for myself.
 
 ## Roadmap
 
-- Run on startup.
-
 - Configurable shortcuts: I don't need these and it will likely require a pop-up
   UI, so I will probably not get to this.
 
