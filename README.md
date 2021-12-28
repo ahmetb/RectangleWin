@@ -10,7 +10,6 @@ only using hotkeys:
 
 ![RectangleWin demo](./RectangleWin-demo.gif)
 
-For now, you have to keep the process running to be able to use it.
 
 ## Keyboard Bindings
 
@@ -32,9 +31,16 @@ For now, you have to keep the process running to be able to use it.
 
 ## Install
 
+With Go 1.17+ installed, run:
+
 ```sh
 go install github.com/ahmetb/RectangleWin@latest
 ```
+
+The binary will be available in your `%USERPROFILE%\go\bin` directory
+(which you can add to your `%PATH%` if it's not there).
+
+For now, you have to keep the process running to be able to use it.
 
 ## Why?
 
