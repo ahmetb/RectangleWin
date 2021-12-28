@@ -49,17 +49,28 @@ func RegisterHotKey(h HotKey) {
 	w32ex.RegisterHotKey(0, h.id, h.mod, h.vk)
 }
 
-func hotKeyLoop() error {
+func msgLoop() error {
+	defer fmt.Println("event loop finished")
 	for {
 		var m w32.MSG
-		if c := w32.GetMessage(&m, 0, w32.WM_HOTKEY, w32.WM_HOTKEY); c <= 0 {
+		c := w32.GetMessage(&m, 0, 0, 0)
+		if c == -1 {
 			return fmt.Errorf("GetMessage failed: %d", c)
+		} else if c == 0 {
+			// WM_QUIT received
+			return nil
 		}
-		h, ok := hotkeys[int(m.WParam)]
-		if !ok {
-			return fmt.Errorf("hotkey without callback: %#v", m)
+		if m.Message == w32.WM_HOTKEY {
+			h, ok := hotkeys[int(m.WParam)]
+			if !ok {
+				return fmt.Errorf("hotkey without callback: %#v", m)
+			}
+			fmt.Printf("trace: hotkey id=%d (%s)\n", m.WParam, h)
+			h.callback()
+		} else {
+			fmt.Printf("unhandled message received:0x%x %d\n", m.Message, m.Message)
+			w32.TranslateMessage(&m)
+			w32.DispatchMessage(&m)
 		}
-		fmt.Printf("trace: hotkey id=%d (%s)\n", m.WParam, h)
-		h.callback()
 	}
 }
