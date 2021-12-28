@@ -1,10 +1,11 @@
 package main
 
 import (
-	"RectangleWin/w32ex"
 	"fmt"
 
 	"github.com/gonutz/w32/v2"
+
+	"github.com/ahmetb/RectangleWin/w32ex"
 )
 
 var (

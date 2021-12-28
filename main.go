@@ -1,13 +1,14 @@
 package main
 
 import (
-	"RectangleWin/w32ex"
 	"errors"
 	"fmt"
 	"reflect"
 
 	"github.com/gonutz/w32/v2"
 	"golang.org/x/sys/windows"
+
+	"github.com/ahmetb/RectangleWin/w32ex"
 )
 
 var lastResized w32.HWND
@@ -41,43 +42,59 @@ func main() {
 		return true
 	})
 
-	resizeFuncs := [][]resizeFunc{
+	edgeFuncs := [][]resizeFunc{
 		{leftHalf, leftTwoThirds, leftOneThirds},
 		{rightHalf, rightTwoThirds, rightOneThirds},
 		{topHalf, topTwoThirds, topOneThirds},
 		{bottomHalf, bottomTwoThirds, bottomOneThirds}}
-	curFuncs := make([]int, len(resizeFuncs))
-	cycleResizeFuncs := func(i int) {
+	edgeFuncTurn := make([]int, len(edgeFuncs))
+	cornerFuncs := [][]resizeFunc{
+		{topLeftHalf, topLeftTwoThirds, topLeftOneThirds},
+		{topRightHalf, topRightTwoThirds, topRightOneThirds},
+		{bottomLeftHalf, bottomLeftTwoThirds, bottomLeftOneThirds},
+		{bottomRightHalf, bottomRightTwoThirds, bottomRightOneThirds}}
+	cornerFuncTurn := make([]int, len(cornerFuncs))
+
+	cycleFuncs := func(funcs [][]resizeFunc, turns *[]int, i int) {
 		hand := w32.GetForegroundWindow()
 		if hand == 0 {
 			panic("foreground window is NULL")
 		}
 		if lastResized != hand {
-			curFuncs = make([]int, len(resizeFuncs)) // reset
+			*turns = make([]int, len(edgeFuncs)) // reset
 		}
-		if _, err := resize(hand, resizeFuncs[i][curFuncs[i]%len(resizeFuncs[i])]); err != nil {
+		if _, err := resize(hand, funcs[i][(*turns)[i]%len(funcs[i])]); err != nil {
 			panic(err)
 		}
-		curFuncs[i]++
-		for j := 0; j < len(curFuncs); j++ {
+		(*turns)[i]++
+		for j := 0; j < len(*turns); j++ {
 			if j != i {
-				curFuncs[j] = 0
+				(*turns)[j] = 0
 			}
 		}
 	}
 
-	RegisterHotKey(HotKey{id: 1, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_LEFT, callback: func() { cycleResizeFuncs(0) }})
-	RegisterHotKey(HotKey{id: 2, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_RIGHT, callback: func() { cycleResizeFuncs(1) }})
-	RegisterHotKey(HotKey{id: 3, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_UP, callback: func() { cycleResizeFuncs(2) }})
-	RegisterHotKey(HotKey{id: 4, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_DOWN, callback: func() { cycleResizeFuncs(3) }})
-	RegisterHotKey(HotKey{id: 5, mod: MOD_SHIFT | MOD_WIN, vk: 0x46 /*F*/, callback: func() {
-		lastResized = 0 // cause curFuncs to be reset
+	cycleEdgeFuncs := func(i int) { cycleFuncs(edgeFuncs, &edgeFuncTurn, i) }
+	cycleCornerFuncs := func(i int) { cycleFuncs(cornerFuncs, &cornerFuncTurn, i) }
+
+	RegisterHotKey(HotKey{id: 1, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_LEFT, callback: func() { cycleEdgeFuncs(0) }})
+	RegisterHotKey(HotKey{id: 2, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_RIGHT, callback: func() { cycleEdgeFuncs(1) }})
+	RegisterHotKey(HotKey{id: 3, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_UP, callback: func() { cycleEdgeFuncs(2) }})
+	RegisterHotKey(HotKey{id: 4, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_DOWN, callback: func() { cycleEdgeFuncs(3) }})
+
+	RegisterHotKey(HotKey{id: 5, mod: MOD_CONTROL | MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_LEFT, callback: func() { cycleCornerFuncs(0) }})
+	RegisterHotKey(HotKey{id: 6, mod: MOD_CONTROL | MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_UP, callback: func() { cycleCornerFuncs(1) }})
+	RegisterHotKey(HotKey{id: 7, mod: MOD_CONTROL | MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_DOWN, callback: func() { cycleCornerFuncs(2) }})
+	RegisterHotKey(HotKey{id: 8, mod: MOD_CONTROL | MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_RIGHT, callback: func() { cycleCornerFuncs(3) }})
+
+	RegisterHotKey(HotKey{id: 50, mod: MOD_SHIFT | MOD_WIN, vk: 0x46 /*F*/, callback: func() {
+		lastResized = 0 // cause edgeFuncTurn to be reset
 		if err := maximize(); err != nil {
 			panic(err)
 		}
 	}})
-	RegisterHotKey(HotKey{id: 6, mod: MOD_SHIFT | MOD_WIN, vk: 0x47 /*G*/, callback: func() {
-		lastResized = 0 // cause curFuncs to be reset
+	RegisterHotKey(HotKey{id: 60, mod: MOD_SHIFT | MOD_WIN, vk: 0x47 /*G*/, callback: func() {
+		lastResized = 0 // cause edgeFuncTurn to be reset
 		// TODO find a common way to GetForegroundWindow and validate it
 		if _, err := resize(w32.GetForegroundWindow(), center); err != nil {
 			panic(err)
@@ -186,6 +203,7 @@ func sameRect(a, b *w32.RECT) bool {
 }
 
 func isSystemWindow(hwnd w32.HWND) bool {
+	// FIXME: this doesn't work for cmd, powershell or Windows Terminal app
 	proc := w32ex.GetWindowModuleFileName(hwnd)
 	return proc == ""
 }

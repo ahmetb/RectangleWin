@@ -1,4 +1,4 @@
-module RectangleWin
+module github.com/ahmetb/RectangleWin
 
 go 1.17
 
