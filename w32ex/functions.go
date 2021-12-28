@@ -22,6 +22,12 @@ import (
 	"github.com/gonutz/w32/v2"
 )
 
+const (
+	GA_PARENT    = 1
+	GA_ROOT      = 2
+	GA_ROOTOWNER = 3
+)
+
 var user32 = syscall.NewLazyDLL("user32.dll")
 
 func RegisterHotKey(hwnd w32.HWND, id, mod, vk int) {
@@ -30,6 +36,7 @@ func RegisterHotKey(hwnd w32.HWND, id, mod, vk int) {
 		panic(fmt.Errorf("failed to register hotkey mod=0x%x,vk=%d err:%d lastErr:%d", mod, vk, r1, w32.GetLastError()))
 	}
 }
+
 func GetDpiForWindow(hwnd w32.HWND) int32 {
 	r1, _, _ := user32.NewProc("GetDpiForWindow").Call(uintptr(hwnd))
 	return int32(r1)
@@ -46,4 +53,14 @@ func GetWindowModuleFileName(hwnd w32.HWND) string {
 		return ""
 	}
 	return syscall.UTF16ToString(path[:])
+}
+
+func GetAncestor(hwnd w32.HWND, gaFlags uint) w32.HWND {
+	r1, _, _ := user32.NewProc("GetAncestor").Call(uintptr(hwnd), uintptr(gaFlags))
+	return w32.HWND(r1)
+}
+
+func GetShellWindow() (hwnd w32.HWND) {
+	r1, _, _ := user32.NewProc("GetShellWindow").Call()
+	return w32.HWND(r1)
 }

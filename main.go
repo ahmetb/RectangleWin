@@ -108,8 +108,8 @@ func center(disp, cur w32.RECT) w32.RECT {
 }
 
 func resize(hwnd w32.HWND, f resizeFunc) (bool, error) {
-	if isSystemWindow(hwnd) {
-		fmt.Printf("warn: system window: %s\n", w32.GetWindowText(hwnd))
+	if !isZonableWindow(hwnd) {
+		fmt.Printf("warn: non-zonable window: %s\n", w32.GetWindowText(hwnd))
 		return false, nil
 	}
 	rect := w32.GetWindowRect(hwnd)
@@ -170,8 +170,8 @@ func resize(hwnd w32.HWND, f resizeFunc) (bool, error) {
 func maximize() error {
 	// TODO find a common way to GetForegroundWindow and validate it
 	hwnd := w32.GetForegroundWindow()
-	if hwnd == 0 {
-		return errors.New("foreground window is NULL")
+	if isZonableWindow(hwnd) {
+		return errors.New("foreground window is not zonable")
 	}
 	if !w32.ShowWindow(hwnd, w32.SW_MAXIMIZE) {
 		return fmt.Errorf("failed to ShowWindow:%d", w32.GetLastError())
@@ -190,10 +190,4 @@ func resizeForDpi(src w32.RECT, from, to int32) w32.RECT {
 
 func sameRect(a, b *w32.RECT) bool {
 	return a != nil && b != nil && reflect.DeepEqual(*a, *b)
-}
-
-func isSystemWindow(hwnd w32.HWND) bool {
-	// FIXME: this doesn't work for cmd, powershell or Windows Terminal app
-	proc := w32ex.GetWindowModuleFileName(hwnd)
-	return proc == ""
 }

@@ -64,11 +64,6 @@ Rectangle.app does, so I wrote this small utility for myself.
   primary display isn't the leftmost-topmost in the display arrangement)
   - Moving a window between displays
 
-- Better detection of system windows: Right now the tool can't properly detect
-  what's a system window (e.g. system tray, or the desktop itself) and therefore
-  some legit apps can't be moved around (e.g. cmd.exe, PowerShell, Windows Terminal,
-  Settings app).
-
 ## License
 
 This project is distributed as-is under the Apache 2.0 license.
