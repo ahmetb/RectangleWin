@@ -49,9 +49,10 @@ func RegisterHotKey(h HotKey) {
 	w32ex.RegisterHotKey(0, h.id, h.mod, h.vk)
 }
 
-func hotKeyLoop() error {
+func hotKeyLoop(tray *NOTIFYICONDATA) error {
 	for {
 		var m w32.MSG
+		tray.HWnd = uintptr(w32.GetForegroundWindow())
 		if c := w32.GetMessage(&m, 0, w32.WM_HOTKEY, w32.WM_HOTKEY); c <= 0 {
 			return fmt.Errorf("GetMessage failed: %d", c)
 		}

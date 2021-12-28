@@ -19,8 +19,10 @@ import (
 	"fmt"
 	"reflect"
 	"runtime"
+	"unsafe"
 
 	"github.com/gonutz/w32/v2"
+	"golang.org/x/sys/windows"
 
 	"github.com/ahmetb/RectangleWin/w32ex"
 )
@@ -90,7 +92,10 @@ func main() {
 			return
 		}
 	}})
-	if err := hotKeyLoop(); err != nil {
+
+	tray := initTray()
+
+	if err := hotKeyLoop(tray); err != nil {
 		panic(err)
 	}
 }
@@ -191,4 +196,36 @@ func resizeForDpi(src w32.RECT, from, to int32) w32.RECT {
 
 func sameRect(a, b *w32.RECT) bool {
 	return a != nil && b != nil && reflect.DeepEqual(*a, *b)
+}
+
+func initTray() *NOTIFYICONDATA {
+
+	var data NOTIFYICONDATA
+
+	data.CbSize = uint32(unsafe.Sizeof(data))
+	data.UFlags = NIF_ICON
+
+	icon, err := LoadImage(
+		0,
+		windows.StringToUTF16Ptr("icon.ico"),
+		IMAGE_ICON,
+		0,
+		0,
+		LR_DEFAULTSIZE|LR_LOADFROMFILE)
+	if err != nil {
+		panic(err)
+	}
+	data.HIcon = icon
+
+	if _, err := Shell_NotifyIcon(NIM_ADD, &data); err != nil {
+		panic(err)
+	}
+
+	defer func() {
+		if _, err := Shell_NotifyIcon(NIM_DELETE, &data); err != nil {
+			panic(err)
+		}
+	}()
+
+	return &data
 }
