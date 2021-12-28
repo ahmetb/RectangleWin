@@ -29,14 +29,14 @@ func main() {
 	cornerFuncTurn := make([]int, len(cornerFuncs))
 
 	cycleFuncs := func(funcs [][]resizeFunc, turns *[]int, i int) {
-		hand := w32.GetForegroundWindow()
-		if hand == 0 {
+		hwnd := w32.GetForegroundWindow()
+		if hwnd == 0 {
 			panic("foreground window is NULL")
 		}
-		if lastResized != hand {
+		if lastResized != hwnd {
 			*turns = make([]int, len(edgeFuncs)) // reset
 		}
-		if _, err := resize(hand, funcs[i][(*turns)[i]%len(funcs[i])]); err != nil {
+		if _, err := resize(hwnd, funcs[i][(*turns)[i]%len(funcs[i])]); err != nil {
 			fmt.Printf("warn: resize: %v\n", err)
 			return
 		}
@@ -75,7 +75,7 @@ func main() {
 			return
 		}
 	}})
-	if err := startHotKeyListen(); err != nil {
+	if err := hotKeyLoop(); err != nil {
 		panic(err)
 	}
 }
@@ -93,15 +93,16 @@ func center(disp, cur w32.RECT) w32.RECT {
 		Bottom: disp.Top + h + cur.Height()}
 }
 
-func resize(hand w32.HWND, f resizeFunc) (bool, error) {
-	if isSystemWindow(hand) {
+func resize(hwnd w32.HWND, f resizeFunc) (bool, error) {
+	if isSystemWindow(hwnd) {
+		fmt.Printf("warn: system window: %s\n", w32.GetWindowText(hwnd))
 		return false, nil
 	}
-	rect := w32.GetWindowRect(hand)
-	mon := w32.MonitorFromWindow(hand, w32.MONITOR_DEFAULTTONULL)
-	hdc := w32.GetDC(hand)
+	rect := w32.GetWindowRect(hwnd)
+	mon := w32.MonitorFromWindow(hwnd, w32.MONITOR_DEFAULTTONULL)
+	hdc := w32.GetDC(hwnd)
 	displayDPI := w32.GetDeviceCaps(hdc, w32.LOGPIXELSY)
-	if !w32.ReleaseDC(hand, hdc) {
+	if !w32.ReleaseDC(hwnd, hdc) {
 		return false, fmt.Errorf("failed to ReleaseDC:%d", w32.GetLastError())
 	}
 	var monInfo w32.MONITORINFO
@@ -109,14 +110,14 @@ func resize(hand w32.HWND, f resizeFunc) (bool, error) {
 		return false, fmt.Errorf("failed to GetMonitorInfo:%d", w32.GetLastError())
 	}
 
-	ok, frame := w32.DwmGetWindowAttributeEXTENDED_FRAME_BOUNDS(hand)
+	ok, frame := w32.DwmGetWindowAttributeEXTENDED_FRAME_BOUNDS(hwnd)
 	if !ok {
 		return false, fmt.Errorf("failed to DwmGetWindowAttributeEXTENDED_FRAME_BOUNDS:%d", w32.GetLastError())
 	}
-	windowDPI := w32ex.GetDpiForWindow(hand)
+	windowDPI := w32ex.GetDpiForWindow(hwnd)
 	resizedFrame := resizeForDpi(frame, int32(windowDPI), int32(displayDPI))
 
-	fmt.Printf("> window: 0x%x       %#v (w:%d,h:%d) mon=0x%X(@ DPI:%d)\n", hand, rect, rect.Width(), rect.Height(), mon, displayDPI)
+	fmt.Printf("> window: 0x%x       %#v (w:%d,h:%d) mon=0x%X(@ DPI:%d)\n", hwnd, rect, rect.Width(), rect.Height(), mon, displayDPI)
 	fmt.Printf("> DWM frame:     %#v (W:%d,H:%d) @ DPI=%v\n", frame, frame.Width(), frame.Height(), windowDPI)
 	fmt.Printf("> DPI-less frame: %#v (W:%d,H:%d)\n", resizedFrame, resizedFrame.Width(), resizedFrame.Height())
 
@@ -134,20 +135,20 @@ func resize(hand w32.HWND, f resizeFunc) (bool, error) {
 	newPos.Right += rExtra
 	newPos.Bottom += bExtra
 
-	lastResized = hand
+	lastResized = hwnd
 	if sameRect(rect, &newPos) {
 		fmt.Println("no resize")
 		return false, nil
 	}
 
 	fmt.Printf("> resizing to: %#v (W:%d,H:%d)\n", newPos, newPos.Width(), newPos.Height())
-	if !w32.ShowWindow(hand, w32.SW_SHOWNORMAL) { // normalize window first if it's set to SW_SHOWMAXIMIZE (and therefore stays maximized)
+	if !w32.ShowWindow(hwnd, w32.SW_SHOWNORMAL) { // normalize window first if it's set to SW_SHOWMAXIMIZE (and therefore stays maximized)
 		return false, fmt.Errorf("failed to normalize window ShowWindow:%d", w32.GetLastError())
 	}
-	if !w32.SetWindowPos(hand, 0, int(newPos.Left), int(newPos.Top), int(newPos.Width()), int(newPos.Height()), w32.SWP_NOZORDER|w32.SWP_NOACTIVATE) {
+	if !w32.SetWindowPos(hwnd, 0, int(newPos.Left), int(newPos.Top), int(newPos.Width()), int(newPos.Height()), w32.SWP_NOZORDER|w32.SWP_NOACTIVATE) {
 		return false, fmt.Errorf("failed to SetWindowPos:%d", w32.GetLastError())
 	}
-	rect = w32.GetWindowRect(hand)
+	rect = w32.GetWindowRect(hwnd)
 	fmt.Printf("> post-resize: %#v(W:%d,H:%d)\n", rect, rect.Width(), rect.Height())
 	return true, nil
 }

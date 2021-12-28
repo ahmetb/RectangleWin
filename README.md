@@ -4,18 +4,11 @@ A minimalistic Windows rewrite of [macOS Rectangle.app](https://rectangleapp.com
 
 A hotkey-oriented window snapping and resizing tool for Windows.
 
-## Why?
+This animation illustrates how RectangleWin helps me move windows to edges
+and corners (and cycle through half, one-thirds or two thirds width or height)
+only using hotkeys:
 
-It seems that no window snapping utility for Windows is capable of letting
-user snip windows to {left, right, top, bottom} {half, two-thirds, one-third }
-using configurable shortcut keys, and center windows in a screen like
-Rectangle.app does, so I wrote this small utility for myself.
-
-## Install
-
-```sh
-go install github.com/ahmetb/RectangleWin@latest
-```
+![RectangleWin demo](./RectangleWin-demo.gif)
 
 For now, you have to keep the process running to be able to use it.
 
@@ -36,6 +29,19 @@ For now, you have to keep the process running to be able to use it.
 - **Maximize window**: <kbd>Win</kbd>+<kbd>Alt</kbd>+<kbd>F</kbd>
 
   (Obsolete since Windows natively supports <kbd>Win</kbd>+<kbd>&uarr;</kbd>)
+
+## Install
+
+```sh
+go install github.com/ahmetb/RectangleWin@latest
+```
+
+## Why?
+
+It seems that no window snapping utility for Windows is capable of letting
+user snip windows to {left, right, top, bottom} {half, two-thirds, one-third }
+using configurable shortcut keys, and center windows in a screen like
+Rectangle.app does, so I wrote this small utility for myself.
 
 ## Roadmap
 

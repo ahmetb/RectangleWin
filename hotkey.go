@@ -35,7 +35,7 @@ func RegisterHotKey(h HotKey) {
 	w32ex.RegisterHotKey(0, h.id, h.mod, h.vk)
 }
 
-func startHotKeyListen() error {
+func hotKeyLoop() error {
 	for {
 		var m w32.MSG
 		if c := w32.GetMessage(&m, 0, w32.WM_HOTKEY, w32.WM_HOTKEY); c <= 0 {
