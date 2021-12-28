@@ -31,9 +31,9 @@ For now, you have to keep the process running to be able to use it.
   - <kbd>Win</kbd> + <<kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>&darr;</kbd>: bottom-left ½, ⅔ and ⅓
   - <kbd>Win</kbd> + <<kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>&rarr;</kbd>: bottom-right ½, ⅔ and ⅓
 
-- **Center window** on the display: <kbd>Win</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd>
+- **Center window** on the display: <kbd>Win</kbd>+<kbd>Alt</kbd>+<kbd>C</kbd>
 
-- **Maximize window**: <kbd>Win</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd>
+- **Maximize window**: <kbd>Win</kbd>+<kbd>Alt</kbd>+<kbd>F</kbd>
 
   (Obsolete since Windows natively supports <kbd>Win</kbd>+<kbd>&uarr;</kbd>)
 

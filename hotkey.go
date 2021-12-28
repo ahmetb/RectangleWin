@@ -25,6 +25,8 @@ type HotKey struct {
 	callback    func()
 }
 
+func (h HotKey) String() string { return fmt.Sprintf("mod=0x%x,vk=%d", h.mod, h.vk) }
+
 func RegisterHotKey(h HotKey) {
 	// TODO not safe for concurrent modification
 	if _, ok := hotkeys[h.id]; ok {
@@ -37,6 +39,7 @@ func RegisterHotKey(h HotKey) {
 func startHotKeyListen() error {
 	for {
 		var m w32.MSG
+		fmt.Println("waiting for hotkey...")
 		if c := w32.GetMessage(&m, 0, w32.WM_HOTKEY, w32.WM_HOTKEY); c <= 0 {
 			return fmt.Errorf("GetMessage failed: %d", c)
 		}
@@ -44,7 +47,8 @@ func startHotKeyListen() error {
 		if !ok {
 			return fmt.Errorf("hotkey without callback: %#v", m)
 		}
-		fmt.Printf("trace: hotkey %d (mod=0x%X,vk=%d)\n", m.WParam, h.mod, h.vk)
+		fmt.Printf("trace: hotkey id=%d (%s)\n", m.WParam, h)
 		h.callback()
+		fmt.Println("hotkey processed")
 	}
 }
