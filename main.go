@@ -78,7 +78,8 @@ func main() {
 	RegisterHotKey(HotKey{id: 50, mod: MOD_SHIFT | MOD_WIN, vk: 0x46 /*F*/, callback: func() {
 		lastResized = 0 // cause edgeFuncTurn to be reset
 		if err := maximize(); err != nil {
-			panic(err)
+			fmt.Printf("warn: maximize: %v\n", err)
+			return
 		}
 	}})
 	RegisterHotKey(HotKey{id: 60, mod: MOD_ALT | MOD_WIN, vk: 0x43 /*C*/, callback: func() {
@@ -170,7 +171,7 @@ func resize(hwnd w32.HWND, f resizeFunc) (bool, error) {
 func maximize() error {
 	// TODO find a common way to GetForegroundWindow and validate it
 	hwnd := w32.GetForegroundWindow()
-	if isZonableWindow(hwnd) {
+	if !isZonableWindow(hwnd) {
 		return errors.New("foreground window is not zonable")
 	}
 	if !w32.ShowWindow(hwnd, w32.SW_MAXIMIZE) {
