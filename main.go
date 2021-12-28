@@ -1,11 +1,10 @@
 package main
 
 import (
+	"RectangleWin/w32ex"
 	"errors"
 	"fmt"
 	"reflect"
-	"syscall"
-	"unsafe"
 
 	"github.com/gonutz/w32/v2"
 	"golang.org/x/sys/windows"
@@ -14,13 +13,6 @@ import (
 var lastResized w32.HWND
 
 func main() {
-	w32.EnumWindows(func(window w32.HWND) bool {
-		fmt.Println("->", window, w32.GetWindowText(window))
-		fmt.Printf("\t%#v\n", w32.GetWindowRect(window))
-		return true
-
-	})
-
 	EnumMonitors(func(d w32.HMONITOR) bool {
 		var v w32.MONITORINFO
 		if !w32.GetMonitorInfo(d, &v) {
@@ -55,7 +47,7 @@ func main() {
 		{topHalf, topTwoThirds, topOneThirds},
 		{bottomHalf, bottomTwoThirds, bottomOneThirds}}
 	curFuncs := make([]int, len(resizeFuncs))
-	applyResize := func(i int) {
+	cycleResizeFuncs := func(i int) {
 		hand := w32.GetForegroundWindow()
 		if hand == 0 {
 			panic("foreground window is NULL")
@@ -74,86 +66,65 @@ func main() {
 		}
 	}
 
-	RegisterHotKey(HotKey{id: 1, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_LEFT, callback: func() { applyResize(0) }})
-	RegisterHotKey(HotKey{id: 2, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_RIGHT, callback: func() { applyResize(1) }})
-	RegisterHotKey(HotKey{id: 3, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_UP, callback: func() { applyResize(2) }})
-	RegisterHotKey(HotKey{id: 4, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_DOWN, callback: func() { applyResize(3) }})
+	RegisterHotKey(HotKey{id: 1, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_LEFT, callback: func() { cycleResizeFuncs(0) }})
+	RegisterHotKey(HotKey{id: 2, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_RIGHT, callback: func() { cycleResizeFuncs(1) }})
+	RegisterHotKey(HotKey{id: 3, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_UP, callback: func() { cycleResizeFuncs(2) }})
+	RegisterHotKey(HotKey{id: 4, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_DOWN, callback: func() { cycleResizeFuncs(3) }})
 	RegisterHotKey(HotKey{id: 5, mod: MOD_SHIFT | MOD_WIN, vk: 0x46 /*F*/, callback: func() {
 		lastResized = 0 // cause curFuncs to be reset
 		if err := maximize(); err != nil {
 			panic(err)
 		}
 	}})
-	// TODO center
-	if err := StartHotKeyListen(); err != nil {
-		// TODO reset curFuncs
+	RegisterHotKey(HotKey{id: 6, mod: MOD_SHIFT | MOD_WIN, vk: 0x47 /*G*/, callback: func() {
+		lastResized = 0 // cause curFuncs to be reset
+		// TODO find a common way to GetForegroundWindow and validate it
+		if _, err := resize(w32.GetForegroundWindow(), center); err != nil {
+			panic(err)
+		}
+	}})
+	if err := startHotKeyListen(); err != nil {
 		panic(err)
 	}
 }
 
-type resizeFunc func(display w32.RECT) w32.RECT
+type resizeFunc func(disp, cur w32.RECT) w32.RECT
 
-func toLeft(d w32.RECT, mul, div int32) w32.RECT {
-	return w32.RECT{Left: 0, Top: 0, Right: (d.Width() * mul) / div, Bottom: d.Height()}
+func center(disp, cur w32.RECT) w32.RECT {
+	// TODO find a way to round up divisions consistently as it causes multiple runs to shift by 1px
+	w := (disp.Width() - cur.Width()) / 2
+	h := (disp.Height() - cur.Height()) / 2
+	return w32.RECT{
+		Left:   disp.Left + w,
+		Right:  disp.Left + w + cur.Width(),
+		Top:    disp.Top + h,
+		Bottom: disp.Top + h + cur.Height()}
 }
-
-func toRight(d w32.RECT, mul, div int32) w32.RECT {
-	return w32.RECT{Left: d.Width() - d.Width()*mul/div, Top: 0, Right: d.Width(), Bottom: d.Height()}
-}
-
-func toTop(d w32.RECT, mul, div int32) w32.RECT {
-	return w32.RECT{Left: 0, Top: 0, Right: d.Width(), Bottom: d.Height() * mul / div}
-}
-
-func toBottom(d w32.RECT, mul, div int32) w32.RECT {
-	return w32.RECT{Left: 0, Top: d.Height() - d.Height()*mul/div, Right: d.Width(), Bottom: d.Height()}
-}
-
-func leftHalf(disp w32.RECT) w32.RECT      { return toLeft(disp, 1, 2) }
-func leftOneThirds(disp w32.RECT) w32.RECT { return toLeft(disp, 1, 3) }
-func leftTwoThirds(disp w32.RECT) w32.RECT { return toLeft(disp, 2, 3) }
-
-func topHalf(disp w32.RECT) w32.RECT      { return toTop(disp, 1, 2) }
-func topOneThirds(disp w32.RECT) w32.RECT { return toTop(disp, 1, 3) }
-func topTwoThirds(disp w32.RECT) w32.RECT { return toTop(disp, 2, 3) }
-
-func rightHalf(disp w32.RECT) w32.RECT      { return toRight(disp, 1, 2) }
-func rightOneThirds(disp w32.RECT) w32.RECT { return toRight(disp, 1, 3) }
-func rightTwoThirds(disp w32.RECT) w32.RECT { return toRight(disp, 2, 3) }
-
-func bottomHalf(disp w32.RECT) w32.RECT      { return toBottom(disp, 1, 2) }
-func bottomOneThirds(disp w32.RECT) w32.RECT { return toBottom(disp, 1, 3) }
-func bottomTwoThirds(disp w32.RECT) w32.RECT { return toBottom(disp, 2, 3) }
 
 func resize(hand w32.HWND, f resizeFunc) (bool, error) {
-	rect := w32.GetWindowRect(hand)
-	proc := GetWindowModuleFileName(hand)
-	title := w32.GetWindowText(hand)
-	fmt.Printf("> title:%s\n", title)
-	fmt.Printf(">  proc:%s\n", proc)
-
-	if proc == "" {
-		fmt.Println("warn: system process resize?")
+	if isSystemWindow(hand) {
 		return false, nil
 	}
-
+	rect := w32.GetWindowRect(hand)
 	mon := w32.MonitorFromWindow(hand, w32.MONITOR_DEFAULTTONULL)
 	hdc := w32.GetDC(hand)
-	monDPI := w32.GetDeviceCaps(hdc, w32.LOGPIXELSY)
+	displayDPI := w32.GetDeviceCaps(hdc, w32.LOGPIXELSY)
 	if !w32.ReleaseDC(hand, hdc) {
 		return false, fmt.Errorf("failed to ReleaseDC:%d", w32.GetLastError())
 	}
-	windowDPI := GetDpiForWindow(hand)
 	var monInfo w32.MONITORINFO
-	w32.GetMonitorInfo(mon, &monInfo)
+	if !w32.GetMonitorInfo(mon, &monInfo) {
+		return false, fmt.Errorf("failed to GetMonitorInfo:%d", w32.GetLastError())
+	}
 
 	ok, frame := w32.DwmGetWindowAttributeEXTENDED_FRAME_BOUNDS(hand)
 	if !ok {
 		return false, fmt.Errorf("failed to DwmGetWindowAttributeEXTENDED_FRAME_BOUNDS:%d", w32.GetLastError())
 	}
-	resizedFrame := resizeForDpi(frame, int32(windowDPI), int32(monDPI))
+	windowDPI := w32ex.GetDpiForWindow(hand)
+	resizedFrame := resizeForDpi(frame, int32(windowDPI), int32(displayDPI))
 
-	fmt.Printf("> window: 0x%x       %#v (w:%d,h:%d) mon=0x%X(@ DPI:%d)\n", hand, rect, rect.Width(), rect.Height(), mon, monDPI)
+	fmt.Printf("> window: 0x%x       %#v (w:%d,h:%d) mon=0x%X(@ DPI:%d)\n", hand, rect, rect.Width(), rect.Height(), mon, displayDPI)
 	fmt.Printf("> DWM frame:     %#v (W:%d,H:%d) @ DPI=%v\n", frame, frame.Width(), frame.Height(), windowDPI)
 	fmt.Printf("> DPI-less frame: %#v (W:%d,H:%d)\n", resizedFrame, resizedFrame.Width(), resizedFrame.Height())
 
@@ -163,7 +134,7 @@ func resize(hand w32.HWND, f resizeFunc) (bool, error) {
 	tExtra := resizedFrame.Top - rect.Top
 	bExtra := -resizedFrame.Bottom + rect.Bottom
 
-	newPos := f(monInfo.RcWork)
+	newPos := f(monInfo.RcWork, resizedFrame)
 
 	// adjust offsets based on invisible borders
 	newPos.Left -= lExtra
@@ -190,6 +161,7 @@ func resize(hand w32.HWND, f resizeFunc) (bool, error) {
 }
 
 func maximize() error {
+	// TODO find a common way to GetForegroundWindow and validate it
 	hwnd := w32.GetForegroundWindow()
 	if hwnd == 0 {
 		return errors.New("foreground window is NULL")
@@ -209,24 +181,11 @@ func resizeForDpi(src w32.RECT, from, to int32) w32.RECT {
 	}
 }
 
-func GetDpiForWindow(hwnd w32.HWND) int32 {
-	r1, _, _ := user32.NewProc("GetDpiForWindow").Call(uintptr(hwnd))
-	return int32(r1)
-}
-
-func GetWindowModuleFileName(hwnd w32.HWND) string {
-	var path [32768]uint16
-	ret, _, _ := user32.NewProc("GetWindowModuleFileNameW").Call(
-		uintptr(hwnd),
-		uintptr(unsafe.Pointer(&path[0])),
-		uintptr(len(path)),
-	)
-	if ret == 0 {
-		return ""
-	}
-	return syscall.UTF16ToString(path[:])
-}
-
 func sameRect(a, b *w32.RECT) bool {
 	return a != nil && b != nil && reflect.DeepEqual(*a, *b)
+}
+
+func isSystemWindow(hwnd w32.HWND) bool {
+	proc := w32ex.GetWindowModuleFileName(hwnd)
+	return proc == ""
 }

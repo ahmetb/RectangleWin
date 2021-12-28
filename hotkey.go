@@ -1,14 +1,13 @@
 package main
 
 import (
+	"RectangleWin/w32ex"
 	"fmt"
-	"syscall"
 
 	"github.com/gonutz/w32/v2"
 )
 
 var (
-	user32  = syscall.NewLazyDLL("user32.dll")
 	hotkeys = make(map[int]*HotKey)
 )
 
@@ -25,23 +24,16 @@ type HotKey struct {
 	callback    func()
 }
 
-func registerHotKey(hwnd w32.HWND, id, mod, vk int) {
-	r1, _, _ := user32.NewProc("RegisterHotKey").Call(uintptr(hwnd), uintptr(id), uintptr(mod), uintptr(vk))
-	if r1 == 0 {
-		panic(fmt.Errorf("failed to register hotkey:%d lastErr:%d", r1, w32.GetLastError()))
-	}
-}
-
 func RegisterHotKey(h HotKey) {
 	// TODO not safe for concurrent modification
 	if _, ok := hotkeys[h.id]; ok {
 		panic("hotkey id already registered") // TODO ok for now
 	}
 	hotkeys[h.id] = &h
-	registerHotKey(0, h.id, h.mod, h.vk)
+	w32ex.RegisterHotKey(0, h.id, h.mod, h.vk)
 }
 
-func StartHotKeyListen() error {
+func startHotKeyListen() error {
 	for {
 		var m w32.MSG
 		if c := w32.GetMessage(&m, 0, w32.WM_HOTKEY, w32.WM_HOTKEY); c <= 0 {
