@@ -32,6 +32,10 @@ var lastResized w32.HWND
 
 func main() {
 	runtime.LockOSThread() // since we bind hotkeys etc that need to dispatch their message here
+	if !w32ex.SetProcessDPIAware() {
+		panic("failed to set DPI aware")
+	}
+
 	edgeFuncs := [][]resizeFunc{
 		{leftHalf, leftTwoThirds, leftOneThirds},
 		{rightHalf, rightTwoThirds, rightOneThirds},

@@ -18,8 +18,7 @@ func onReady() {
 	systray.SetIcon(icon)
 	systray.SetTitle("RectangleWin")
 	systray.SetTooltip("RectangleWin")
-	mQuit := systray.AddMenuItem("Quit", "Quit the whole app")
-	mQuit.SetIcon(icon)
+	mQuit := systray.AddMenuItem("Quit", "")
 	go func() {
 		<-mQuit.ClickedCh
 		fmt.Println("clicked Quit")

@@ -64,3 +64,8 @@ func GetShellWindow() (hwnd w32.HWND) {
 	r1, _, _ := user32.NewProc("GetShellWindow").Call()
 	return w32.HWND(r1)
 }
+
+func SetProcessDPIAware() bool {
+	r1, _, _ := user32.NewProc("SetProcessDPIAware").Call()
+	return r1 != 0
+}
