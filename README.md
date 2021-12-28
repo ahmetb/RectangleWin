@@ -50,11 +50,7 @@ Rectangle.app does, so I wrote this small utility for myself.
 
 ## Roadmap
 
-- Running without a cmd window i.e. `"-H=windowsgui"`.
-
 - Run on startup.
-
-- Set .exe icon with embedded string.
 
 - Configurable shortcuts: I don't need these and it will likely require a pop-up
   UI, so I will probably not get to this.
