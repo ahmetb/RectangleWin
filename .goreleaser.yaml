@@ -1,0 +1,7 @@
+builds:
+  - goos:
+      - windows
+    ldflags:
+      - -H=windowsgui
+archives:
+- format: binary

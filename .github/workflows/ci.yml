@@ -1,0 +1,59 @@
+# Copyright 2022 Ahmet Alp Balkan
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: RectangleWin
+on:
+  push:
+  pull_request:
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+    - name: Setup Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.17
+    - id: go-cache-paths
+      run: |
+        echo "::set-output name=go-build::$(go env GOCACHE)"
+        echo "::set-output name=go-mod::$(go env GOMODCACHE)"
+    - name: go build cache
+      uses: actions/cache@v2
+      with:
+        key: ${{ runner.os }}-go-build-${{ hashFiles('**/go.sum') }}
+        path: |
+          ${{ steps.go-cache-paths.outputs.go-build }}
+          ${{ steps.go-cache-paths.outputs.go-mod }}
+    - name: Ensure gofmt
+      run: test -z "$(gofmt -s -d .)"
+    - name: Ensure go.mod is already tidied
+      run: go mod tidy && git diff --no-patch --exit-code
+    - name: go generate (Binary Version Information and Icon)
+      run: go generate
+    - name: Build-only (GoReleaser)
+      uses: goreleaser/goreleaser-action@v2
+      if: "!startsWith(github.ref, 'refs/tags/')"
+      with:
+        distribution: goreleaser
+        version: latest
+        args: release --snapshot --skip-publish --rm-dist
+    - name: Publish (GoReleaser)
+      uses: goreleaser/goreleaser-action@v2
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        distribution: goreleaser
+        version: latest
+        args: release --rm-dist
