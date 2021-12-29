@@ -19,10 +19,13 @@ import (
 	"fmt"
 
 	"github.com/getlantern/systray"
+	"github.com/gonutz/w32/v2"
 )
 
 //go:embed assets/tray_icon.ico
 var icon []byte
+
+const repo = "https://github.com/ahmetb/RectangleWin"
 
 func initTray() {
 	systray.Register(onReady, onExit)
@@ -37,6 +40,18 @@ func onReady() {
 	if err != nil {
 		panic(err)
 	}
+
+	mRepo := systray.AddMenuItem("Documentation", "")
+	go func() {
+		for range mRepo.ClickedCh {
+			if err := w32.ShellExecute(0, "open", repo, "", "", w32.SW_SHOWNORMAL); err != nil {
+				fmt.Printf("failed to launch browser: (%d), %v\n", w32.GetLastError(), err)
+			}
+		}
+	}()
+
+	systray.AddSeparator()
+
 	mAutoRun := systray.AddMenuItemCheckbox("Run on startup", "", autorun)
 	go func() {
 		for range mAutoRun.ClickedCh {
