@@ -31,15 +31,25 @@ only using hotkeys:
 
 ## Install
 
-With Go 1.17+ installed, run:
+1. Go to [Releases](https://github.com/ahmetb/RectangleWin/releases) and
+   download the suitable binary for your architecture (typically x64).
+
+2. Launch the `.exe` file. Now the program icon should be visible on system
+   tray.
+
+3. Click on the icon and mark as "Run on startup" to make sure you don't have
+   to run it every time you reboot your PC.
+
+## Install from source
+
+With Go 1.17+ installed, clone this repository and run:
 
 ```sh
-go install -ldflags -H=windowsgui github.com/ahmetb/RectangleWin@latest
+go generate
+go build -ldflags -H=windowsgui .
 ```
 
-The binary will be available in your `%USERPROFILE%\go\bin` directory
-(which you can add to your `%PATH%` if it's not there). Launch it, and it will
-be present on the System Tray as an icon (it does not launch on startup yet).
+The `RectangleWin.exe` will be available in the same directory.
 
 ## Why?
 

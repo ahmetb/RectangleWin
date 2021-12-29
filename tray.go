@@ -37,7 +37,7 @@ func onReady() {
 	if err != nil {
 		panic(err)
 	}
-	mAutoRun := systray.AddMenuItemCheckbox("Start on startup", "", autorun)
+	mAutoRun := systray.AddMenuItemCheckbox("Run on startup", "", autorun)
 	go func() {
 		for range mAutoRun.ClickedCh {
 			if mAutoRun.Checked() {
