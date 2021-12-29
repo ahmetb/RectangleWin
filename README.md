@@ -8,8 +8,18 @@ This animation illustrates how RectangleWin helps me move windows to edges
 and corners (and cycle through half, one-thirds or two thirds width or height)
 only using hotkeys:
 
-![RectangleWin demo](./demo/RectangleWin-demo.gif)
+![RectangleWin demo](./assets/RectangleWin-demo.gif)
 
+## Install
+
+1. Go to [Releases](https://github.com/ahmetb/RectangleWin/releases) and
+   download the suitable binary for your architecture (typically x64).
+
+2. Launch the `.exe` file. Now the program icon should be visible on system
+   tray!
+
+3. Click on the icon and mark as "Run on startup" to make sure you don't have
+   to run it every time you reboot your PC.
 
 ## Keyboard Bindings
 
@@ -29,16 +39,7 @@ only using hotkeys:
 
   (Obsolete since Windows natively supports <kbd>Win</kbd>+<kbd>&uarr;</kbd>)
 
-## Install
 
-1. Go to [Releases](https://github.com/ahmetb/RectangleWin/releases) and
-   download the suitable binary for your architecture (typically x64).
-
-2. Launch the `.exe` file. Now the program icon should be visible on system
-   tray.
-
-3. Click on the icon and mark as "Run on startup" to make sure you don't have
-   to run it every time you reboot your PC.
 
 ## Install from source
 

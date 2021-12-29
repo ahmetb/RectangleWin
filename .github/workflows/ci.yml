@@ -39,7 +39,7 @@ jobs:
           ${{ steps.go-cache-paths.outputs.go-mod }}
     - name: Ensure gofmt
       run: test -z "$(gofmt -s -d .)"
-    - name: Ensure go.mod is already tidied
+    - name: go.mod is tidied
       run: go mod tidy && git diff --no-patch --exit-code
     - name: go generate (Binary Version Information and Icon)
       run: go generate
@@ -50,7 +50,7 @@ jobs:
         distribution: goreleaser
         version: latest
         args: release --snapshot --skip-publish --rm-dist
-    - name: Publish (GoReleaser)
+    - name: Publish release (GoReleaser)
       if: startsWith(github.ref, 'refs/tags/')
       uses: goreleaser/goreleaser-action@v2
       env:
