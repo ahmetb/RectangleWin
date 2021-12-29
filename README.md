@@ -1,6 +1,8 @@
 # RectangleWin
 
-A minimalistic Windows rewrite of [macOS Rectangle.app](https://rectangleapp.com).
+A minimalistic Windows rewrite of macOS
+[Rectangle.app](https://rectangleapp.com)/[Spectacle.app](https://www.spectacleapp.com/).
+([Why?](#why))
 
 A hotkey-oriented window snapping and resizing tool for Windows.
 
@@ -55,9 +57,13 @@ The `RectangleWin.exe` will be available in the same directory.
 ## Why?
 
 It seems that no window snapping utility for Windows is capable of letting
-user snip windows to {left, right, top, bottom} {half, two-thirds, one-third }
-using configurable shortcut keys, and center windows in a screen like
+user snap windows to edges or corners in {half, two-thirds, one-third} sizes
+using configurable **shortcut keys**, and center windows in a screen like
 Rectangle.app does, so I wrote this small utility for myself.
+
+I've tried the native Windows shortcuts and PowerToys FancyZones and they
+are not supporting corners, alternating between half and one/two thirds, and
+are not offering enough hotkey support.
 
 ## Roadmap
 
