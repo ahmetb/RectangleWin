@@ -8,7 +8,7 @@ This animation illustrates how RectangleWin helps me move windows to edges
 and corners (and cycle through half, one-thirds or two thirds width or height)
 only using hotkeys:
 
-![RectangleWin demo](./RectangleWin-demo.gif)
+![RectangleWin demo](./demo/RectangleWin-demo.gif)
 
 
 ## Keyboard Bindings

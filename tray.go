@@ -21,7 +21,7 @@ import (
 	"github.com/getlantern/systray"
 )
 
-//go:embed icon.ico
+//go:embed assets/tray_icon.ico
 var icon []byte
 
 func initTray() {
