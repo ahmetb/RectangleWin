@@ -22,15 +22,7 @@ import (
 )
 
 var (
-	hotkeys = make(map[int]*HotKey)
-)
-
-const (
-	MOD_ALT      = 0x0001
-	MOD_CONTROL  = 0x0002
-	MOD_NOREPEAT = 0x4000
-	MOD_SHIFT    = 0x0004
-	MOD_WIN      = 0x0008
+	hotkeyRegistrations = make(map[int]*HotKey)
 )
 
 type HotKey struct {
@@ -40,13 +32,37 @@ type HotKey struct {
 
 func (h HotKey) String() string { return fmt.Sprintf("mod=0x%x,vk=%d", h.mod, h.vk) }
 
-func RegisterHotKey(h HotKey) {
-	// TODO not safe for concurrent modification
-	if _, ok := hotkeys[h.id]; ok {
+func (h HotKey) Describe() string {
+	var out string
+	if h.mod&MOD_WIN == MOD_WIN {
+		out += modKeyNames[MOD_WIN] + " + "
+	}
+	if h.mod&MOD_CONTROL == MOD_CONTROL {
+		out += modKeyNames[MOD_CONTROL] + " + "
+	}
+	if h.mod&MOD_ALT == MOD_ALT {
+		out += modKeyNames[MOD_ALT] + " + "
+	}
+	if h.mod&MOD_SHIFT == MOD_SHIFT {
+		out += modKeyNames[MOD_SHIFT] + " + "
+	}
+	if v, ok := keyNames[h.vk]; ok {
+		out += v
+	} else {
+		out += fmt.Sprintf("UNKNOWN KEY(0x%x)", h.vk)
+	}
+	return out
+}
+
+func RegisterHotKey(h HotKey) bool {
+	if _, ok := hotkeyRegistrations[h.id]; ok {
 		panic("hotkey id already registered") // TODO ok for now
 	}
-	hotkeys[h.id] = &h
-	w32ex.RegisterHotKey(0, h.id, h.mod, h.vk)
+	ok := w32ex.RegisterHotKey(0, h.id, h.mod, h.vk)
+	if ok {
+		hotkeyRegistrations[h.id] = &h
+	}
+	return ok
 }
 
 func msgLoop() error {
@@ -61,7 +77,7 @@ func msgLoop() error {
 			return nil
 		}
 		if m.Message == w32.WM_HOTKEY {
-			h, ok := hotkeys[int(m.WParam)]
+			h, ok := hotkeyRegistrations[int(m.WParam)]
 			if !ok {
 				return fmt.Errorf("hotkey without callback: %#v", m)
 			}

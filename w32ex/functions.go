@@ -15,7 +15,6 @@
 package w32ex
 
 import (
-	"fmt"
 	"syscall"
 	"unsafe"
 
@@ -30,11 +29,9 @@ const (
 
 var user32 = syscall.NewLazyDLL("user32.dll")
 
-func RegisterHotKey(hwnd w32.HWND, id, mod, vk int) {
+func RegisterHotKey(hwnd w32.HWND, id, mod, vk int) bool {
 	r1, _, _ := user32.NewProc("RegisterHotKey").Call(uintptr(hwnd), uintptr(id), uintptr(mod), uintptr(vk))
-	if r1 == 0 {
-		panic(fmt.Errorf("failed to register hotkey mod=0x%x,vk=%d err:%d lastErr:%d", mod, vk, r1, w32.GetLastError()))
-	}
+	return r1 != 0
 }
 
 func GetDpiForWindow(hwnd w32.HWND) int32 {

@@ -81,30 +81,45 @@ func main() {
 	cycleEdgeFuncs := func(i int) { cycleFuncs(edgeFuncs, &edgeFuncTurn, i) }
 	cycleCornerFuncs := func(i int) { cycleFuncs(cornerFuncs, &cornerFuncTurn, i) }
 
-	RegisterHotKey(HotKey{id: 1, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_LEFT, callback: func() { cycleEdgeFuncs(0) }})
-	RegisterHotKey(HotKey{id: 2, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_RIGHT, callback: func() { cycleEdgeFuncs(1) }})
-	RegisterHotKey(HotKey{id: 3, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_UP, callback: func() { cycleEdgeFuncs(2) }})
-	RegisterHotKey(HotKey{id: 4, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_DOWN, callback: func() { cycleEdgeFuncs(3) }})
+	hks := []HotKey{
+		(HotKey{id: 1, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_LEFT, callback: func() { cycleEdgeFuncs(0) }}),
+		(HotKey{id: 2, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_RIGHT, callback: func() { cycleEdgeFuncs(1) }}),
+		(HotKey{id: 3, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_UP, callback: func() { cycleEdgeFuncs(2) }}),
+		(HotKey{id: 4, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_DOWN, callback: func() { cycleEdgeFuncs(3) }}),
+		(HotKey{id: 5, mod: MOD_CONTROL | MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_LEFT, callback: func() { cycleCornerFuncs(0) }}),
+		(HotKey{id: 6, mod: MOD_CONTROL | MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_UP, callback: func() { cycleCornerFuncs(1) }}),
+		(HotKey{id: 7, mod: MOD_CONTROL | MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_DOWN, callback: func() { cycleCornerFuncs(2) }}),
+		(HotKey{id: 8, mod: MOD_CONTROL | MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_RIGHT, callback: func() { cycleCornerFuncs(3) }}),
+		(HotKey{id: 50, mod: MOD_SHIFT | MOD_WIN, vk: 0x46 /*F*/, callback: func() {
+			lastResized = 0 // cause edgeFuncTurn to be reset
+			if err := maximize(); err != nil {
+				fmt.Printf("warn: maximize: %v\n", err)
+				return
+			}
+		}}),
+		(HotKey{id: 60, mod: MOD_ALT | MOD_WIN, vk: 0x43 /*C*/, callback: func() {
+			lastResized = 0 // cause edgeFuncTurn to be reset
+			if _, err := resize(w32.GetForegroundWindow(), center); err != nil {
+				fmt.Printf("warn: resize: %v\n", err)
+				return
+			}
+		}}),
+	}
 
-	RegisterHotKey(HotKey{id: 5, mod: MOD_CONTROL | MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_LEFT, callback: func() { cycleCornerFuncs(0) }})
-	RegisterHotKey(HotKey{id: 6, mod: MOD_CONTROL | MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_UP, callback: func() { cycleCornerFuncs(1) }})
-	RegisterHotKey(HotKey{id: 7, mod: MOD_CONTROL | MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_DOWN, callback: func() { cycleCornerFuncs(2) }})
-	RegisterHotKey(HotKey{id: 8, mod: MOD_CONTROL | MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_RIGHT, callback: func() { cycleCornerFuncs(3) }})
-
-	RegisterHotKey(HotKey{id: 50, mod: MOD_SHIFT | MOD_WIN, vk: 0x46 /*F*/, callback: func() {
-		lastResized = 0 // cause edgeFuncTurn to be reset
-		if err := maximize(); err != nil {
-			fmt.Printf("warn: maximize: %v\n", err)
-			return
+	var failedHotKeys []HotKey
+	for _, hk := range hks {
+		if !RegisterHotKey(hk) {
+			failedHotKeys = append(failedHotKeys, hk)
 		}
-	}})
-	RegisterHotKey(HotKey{id: 60, mod: MOD_ALT | MOD_WIN, vk: 0x43 /*C*/, callback: func() {
-		lastResized = 0 // cause edgeFuncTurn to be reset
-		if _, err := resize(w32.GetForegroundWindow(), center); err != nil {
-			fmt.Printf("warn: resize: %v\n", err)
-			return
+	}
+	if len(failedHotKeys) > 0 {
+		msg := "The following hotkey(s) are in use by another process:\n\n"
+		for _, hk := range failedHotKeys {
+			msg += "  - " + hk.Describe() + "\n"
 		}
-	}})
+		msg += "\nTo use these hotkeys in RectangleWin, close the other process using the key combination(s)."
+		showMessageBox(msg)
+	}
 
 	exitCh := make(chan os.Signal)
 	signal.Notify(exitCh, os.Interrupt)
@@ -122,6 +137,10 @@ func main() {
 	if err := msgLoop(); err != nil {
 		panic(err)
 	}
+}
+
+func showMessageBox(text string) {
+	w32.MessageBox(w32.GetActiveWindow(), text, "RectangleWin", w32.MB_ICONWARNING|w32.MB_OK)
 }
 
 type resizeFunc func(disp, cur w32.RECT) w32.RECT
