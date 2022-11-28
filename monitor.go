@@ -40,9 +40,9 @@ func printMonitors() {
 			return false
 		}
 		fmt.Printf("> monitor:0x%x\n", d)
-		fmt.Printf("     rcwork:%#v\n", v.RcWork)
-		fmt.Printf("  rcmonitor:%#v\n", v.RcMonitor)
-		fmt.Printf("    primary:%#v\n", v.DwFlags&w32.MONITORINFOF_PRIMARY > 0)
+		fmt.Printf("       rcwork:%#v\n", v.RcWork)
+		fmt.Printf("    rcmonitor:%#v\n", v.RcMonitor)
+		fmt.Printf("      primary:%#v\n", v.DwFlags&w32.MONITORINFOF_PRIMARY > 0)
 
 		ok, n := w32.GetNumberOfPhysicalMonitorsFromHMONITOR(d)
 		if !ok {
@@ -55,7 +55,7 @@ func printMonitors() {
 			} else {
 				for i, p := range pMon {
 					name := windows.UTF16ToString(p.Description[:])
-					fmt.Printf("  physical monitor#%d: %s\n", i, name)
+					fmt.Printf("  > physical monitor#%d: %s\n", i, name)
 				}
 			}
 		}

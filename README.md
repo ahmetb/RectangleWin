@@ -41,19 +41,6 @@ only using hotkeys:
 
   (Obsolete since Windows natively supports <kbd>Win</kbd>+<kbd>&uarr;</kbd>)
 
-
-
-## Install from source
-
-With Go 1.17+ installed, clone this repository and run:
-
-```sh
-go generate
-go build -ldflags -H=windowsgui .
-```
-
-The `RectangleWin.exe` will be available in the same directory.
-
 ## Why?
 
 It seems that no window snapping utility for Windows is capable of letting
@@ -70,13 +57,20 @@ are not offering enough hotkey support.
 - Configurable shortcuts: I don't need these and it will likely require a pop-up
   UI, so I will probably not get to this.
 
-- **Multiple monitor support**: I don't need this right now and I don't own
-  a secondary display so these will need your help.
-  - Support multiple displays (the code is very likely buggy right now when the
-  primary display isn't the leftmost-topmost in the display arrangement)
-  - Moving a window between displays
+## Development (Install from source)
+
+With Go 1.17+ installed, clone this repository and run:
+
+```sh
+go generate
+GOOS=windows go build -ldflags -H=windowsgui .
+```
+
+The `RectangleWin.exe` will be available in the same directory.
 
 ## License
 
 This project is distributed as-is under the Apache 2.0 license.
 See [LICENSE](./LICENSE).
+
+If you see bugs, please open issues. I can't promise any fixes.

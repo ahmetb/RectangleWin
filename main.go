@@ -162,7 +162,7 @@ func resize(hwnd w32.HWND, f resizeFunc) (bool, error) {
 		return false, nil
 	}
 	rect := w32.GetWindowRect(hwnd)
-	mon := w32.MonitorFromWindow(hwnd, w32.MONITOR_DEFAULTTONULL)
+	mon := w32.MonitorFromWindow(hwnd, w32.MONITOR_DEFAULTTONEAREST)
 	hdc := w32.GetDC(hwnd)
 	displayDPI := w32.GetDeviceCaps(hdc, w32.LOGPIXELSY)
 	if !w32.ReleaseDC(hwnd, hdc) {
@@ -180,9 +180,9 @@ func resize(hwnd w32.HWND, f resizeFunc) (bool, error) {
 	windowDPI := w32ex.GetDpiForWindow(hwnd)
 	resizedFrame := resizeForDpi(frame, int32(windowDPI), int32(displayDPI))
 
-	fmt.Printf("> window: 0x%x       %#v (w:%d,h:%d) mon=0x%X(@ DPI:%d)\n", hwnd, rect, rect.Width(), rect.Height(), mon, displayDPI)
-	fmt.Printf("> DWM frame:     %#v (W:%d,H:%d) @ DPI=%v\n", frame, frame.Width(), frame.Height(), windowDPI)
-	fmt.Printf("> DPI-less frame: %#v (W:%d,H:%d)\n", resizedFrame, resizedFrame.Width(), resizedFrame.Height())
+	fmt.Printf("> window: 0x%x %#v (w:%d,h:%d) mon=0x%X(@ display DPI:%d)\n", hwnd, rect, rect.Width(), rect.Height(), mon, displayDPI)
+	fmt.Printf("> DWM frame:        %#v (W:%d,H:%d) @ window DPI=%v\n", frame, frame.Width(), frame.Height(), windowDPI)
+	fmt.Printf("> DPI-less frame:   %#v (W:%d,H:%d)\n", resizedFrame, resizedFrame.Width(), resizedFrame.Height())
 
 	// calculate how many extra pixels go to win10 invisible borders
 	lExtra := resizedFrame.Left - rect.Left
