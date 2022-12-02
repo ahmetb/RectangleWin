@@ -104,6 +104,15 @@ func main() {
 				return
 			}
 		}}),
+		// hot key A always on top
+		(HotKey{id: 70, mod: MOD_ALT | MOD_WIN, vk: 0x41 /*A*/, callback: func() {
+			lastResized = 0 // cause edgeFuncTurn to be reset
+			fmt.Println("always on top")
+			if err := toggleAlwaysOnTop(); err != nil {
+				fmt.Printf("warn: toggleAlwaysOnTop: %v\n", err)
+				return
+			}
+		}}),
 	}
 
 	var failedHotKeys []HotKey
@@ -238,4 +247,21 @@ func resizeForDpi(src w32.RECT, from, to int32) w32.RECT {
 
 func sameRect(a, b *w32.RECT) bool {
 	return a != nil && b != nil && reflect.DeepEqual(*a, *b)
+}
+
+func toggleAlwaysOnTop() error {
+	hwnd := w32.GetForegroundWindow()
+	if !isZonableWindow(hwnd) {
+		return errors.New("foreground window is not zonable")
+	}
+	if w32.GetWindowLong(hwnd, w32.GWL_EXSTYLE)&w32.WS_EX_TOPMOST != 0 {
+		if !w32.SetWindowPos(hwnd, w32.HWND_NOTOPMOST, 0, 0, 0, 0, w32.SWP_NOMOVE|w32.SWP_NOSIZE) {
+			return fmt.Errorf("failed to SetWindowPos:%d", w32.GetLastError())
+		}
+	} else {
+		if !w32.SetWindowPos(hwnd, w32.HWND_TOPMOST, 0, 0, 0, 0, w32.SWP_NOMOVE|w32.SWP_NOSIZE) {
+			return fmt.Errorf("failed to SetWindowPos:%d", w32.GetLastError())
+		}
+	}
+	return nil
 }
