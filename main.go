@@ -236,6 +236,35 @@ func maximize() error {
 	return nil
 }
 
+func toggleAlwaysOnTop() error {
+	hwnd := w32.GetForegroundWindow()
+	if !isZonableWindow(hwnd) {
+		return errors.New("foreground window is not zonable")
+	}
+
+	// Check if the window is currently always on top
+	isOnTop := w32.GetWindowLong(hwnd, w32.GWL_EXSTYLE)&w32.WS_EX_TOPMOST != 0
+
+	// Change the window position based on its current state
+	var hwndInsertAfter w32.HWND
+	var bgColor uint8
+	if isOnTop {
+		hwndInsertAfter = w32.HWND_NOTOPMOST
+		bgColor = 255
+	} else {
+		hwndInsertAfter = w32.HWND_TOPMOST
+		bgColor = 0xe6
+	}
+	if !w32.SetWindowPos(hwnd, hwndInsertAfter, 0, 0, 0, 0, w32.SWP_NOMOVE|w32.SWP_NOSIZE) {
+		return fmt.Errorf("failed to SetWindowPos:%d", w32.GetLastError())
+	}
+
+	w32.SetWindowLong(hwnd, w32.GWL_EXSTYLE, w32.GetWindowLong(hwnd, w32.GWL_EXSTYLE)|w32.WS_EX_LAYERED)
+	w32.SetLayeredWindowAttributes(hwnd, 0, bgColor, w32.LWA_ALPHA)
+
+	return nil
+}
+
 func resizeForDpi(src w32.RECT, from, to int32) w32.RECT {
 	return w32.RECT{
 		Left:   src.Left * to / from,
@@ -247,21 +276,4 @@ func resizeForDpi(src w32.RECT, from, to int32) w32.RECT {
 
 func sameRect(a, b *w32.RECT) bool {
 	return a != nil && b != nil && reflect.DeepEqual(*a, *b)
-}
-
-func toggleAlwaysOnTop() error {
-	hwnd := w32.GetForegroundWindow()
-	if !isZonableWindow(hwnd) {
-		return errors.New("foreground window is not zonable")
-	}
-	if w32.GetWindowLong(hwnd, w32.GWL_EXSTYLE)&w32.WS_EX_TOPMOST != 0 {
-		if !w32.SetWindowPos(hwnd, w32.HWND_NOTOPMOST, 0, 0, 0, 0, w32.SWP_NOMOVE|w32.SWP_NOSIZE) {
-			return fmt.Errorf("failed to SetWindowPos:%d", w32.GetLastError())
-		}
-	} else {
-		if !w32.SetWindowPos(hwnd, w32.HWND_TOPMOST, 0, 0, 0, 0, w32.SWP_NOMOVE|w32.SWP_NOSIZE) {
-			return fmt.Errorf("failed to SetWindowPos:%d", w32.GetLastError())
-		}
-	}
-	return nil
 }
