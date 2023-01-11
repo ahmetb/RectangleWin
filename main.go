@@ -44,6 +44,7 @@ func main() {
 		panic(err)
 	}
 	fmt.Printf("autorun enabled=%v\n", autorun)
+	printMonitors()
 
 	edgeFuncs := [][]resizeFunc{
 		{leftHalf, leftTwoThirds, leftOneThirds},

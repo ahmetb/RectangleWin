@@ -33,15 +33,16 @@ func EnumMonitors(f func(d w32.HMONITOR) bool) bool {
 }
 
 func printMonitors() {
-	// TODO unused
+	i := 0
 	EnumMonitors(func(d w32.HMONITOR) bool {
 		var v w32.MONITORINFO
 		if !w32.GetMonitorInfo(d, &v) {
 			return false
 		}
-		fmt.Printf("> monitor:0x%x\n", d)
-		fmt.Printf("       rcwork:%#v\n", v.RcWork)
-		fmt.Printf("    rcmonitor:%#v\n", v.RcMonitor)
+		fmt.Printf("> monitor#%d: 0x%x\n", i, d)
+		i++
+		fmt.Printf("       rcwork:%#v (w=%v,h=%v)\n", v.RcWork, v.RcWork.Width(), v.RcWork.Height())
+		fmt.Printf("    rcmonitor:%#v (w=%v,h=%v)\n", v.RcMonitor, v.RcMonitor.Width(), v.RcWork.Height())
 		fmt.Printf("      primary:%#v\n", v.DwFlags&w32.MONITORINFOF_PRIMARY > 0)
 
 		ok, n := w32.GetNumberOfPhysicalMonitorsFromHMONITOR(d)
