@@ -31,7 +31,7 @@ func toRight(d w32.RECT, mul, div int32) w32.RECT {
 		Left:   d.Left + d.Width() - d.Width()*mul/div,
 		Top:    d.Top,
 		Right:  d.Left + d.Width(),
-		Bottom: d.Height()}
+		Bottom: d.Top + d.Height()}
 }
 
 func toTop(d w32.RECT, mul, div int32) w32.RECT {
