@@ -105,6 +105,14 @@ func main() {
 				return
 			}
 		}}),
+		(HotKey{id: 70, mod: MOD_ALT | MOD_WIN, vk: 0x41 /*A*/, callback: func() {
+			hwnd := w32.GetForegroundWindow()
+			if err := toggleAlwaysOnTop(hwnd); err != nil {
+				fmt.Printf("warn: toggleAlwaysOnTop: %v\n", err)
+				return
+			}
+			fmt.Printf("> toggled always on top: %v\n", hwnd)
+		}}),
 	}
 
 	var failedHotKeys []HotKey
@@ -224,6 +232,23 @@ func maximize() error {
 	}
 	if !w32.ShowWindow(hwnd, w32.SW_MAXIMIZE) {
 		return fmt.Errorf("failed to ShowWindow:%d", w32.GetLastError())
+	}
+	return nil
+}
+
+func toggleAlwaysOnTop(hwnd w32.HWND) error {
+	if !isZonableWindow(hwnd) {
+		return errors.New("foreground window is not zonable")
+	}
+
+	if w32.GetWindowLong(hwnd, w32.GWL_EXSTYLE)&w32.WS_EX_TOPMOST != 0 {
+		if !w32.SetWindowPos(hwnd, w32.HWND_NOTOPMOST, 0, 0, 0, 0, w32.SWP_NOMOVE|w32.SWP_NOSIZE) {
+			return fmt.Errorf("failed to SetWindowPos(HWND_NOTOPMOST): %v", w32.GetLastError())
+		}
+	} else {
+		if !w32.SetWindowPos(hwnd, w32.HWND_TOPMOST, 0, 0, 0, 0, w32.SWP_NOMOVE|w32.SWP_NOSIZE) {
+			return fmt.Errorf("failed to SetWindowPos(HWND_TOPMOST) :%v", w32.GetLastError())
+		}
 	}
 	return nil
 }
