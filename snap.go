@@ -77,6 +77,9 @@ func topRightTwoThirds(disp, _ w32.RECT) w32.RECT {
 func topRightOneThirds(disp, _ w32.RECT) w32.RECT {
 	return merge(toRight(disp, 1, 3), toTop(disp, 1, 2))
 }
+func topMaximize(disp, _ w32.RECT) w32.RECT {
+	return toTop(disp, 1, 1)
+}
 
 func bottomLeftHalf(disp, _ w32.RECT) w32.RECT {
 	return merge(toLeft(disp, 1, 2), toBottom(disp, 1, 2))

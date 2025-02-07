@@ -51,13 +51,13 @@ func main() {
 		{rightHalf, rightTwoThirds, rightOneThirds},
 		{topHalf, topTwoThirds, topOneThirds},
 		{bottomHalf, bottomTwoThirds, bottomOneThirds}}
-	edgeFuncTurn := make([]int, len(edgeFuncs))
-	cornerFuncs := [][]resizeFunc{
-		{topLeftHalf, topLeftTwoThirds, topLeftOneThirds},
-		{topRightHalf, topRightTwoThirds, topRightOneThirds},
-		{bottomLeftHalf, bottomLeftTwoThirds, bottomLeftOneThirds},
-		{bottomRightHalf, bottomRightTwoThirds, bottomRightOneThirds}}
-	cornerFuncTurn := make([]int, len(cornerFuncs))
+	// edgeFuncTurn := make([]int, len(edgeFuncs))
+	// cornerFuncs := [][]resizeFunc{
+	// 	{topLeftHalf, topLeftTwoThirds, topLeftOneThirds},
+	// 	{topRightHalf, topRightTwoThirds, topRightOneThirds},
+	// 	{bottomLeftHalf, bottomLeftTwoThirds, bottomLeftOneThirds},
+	// 	{bottomRightHalf, bottomRightTwoThirds, bottomRightOneThirds}}
+	// cornerFuncTurn := make([]int, len(cornerFuncs))
 
 	cycleFuncs := func(funcs [][]resizeFunc, turns *[]int, i int) {
 		hwnd := w32.GetForegroundWindow()
@@ -79,40 +79,56 @@ func main() {
 		}
 	}
 
-	cycleEdgeFuncs := func(i int) { cycleFuncs(edgeFuncs, &edgeFuncTurn, i) }
-	cycleCornerFuncs := func(i int) { cycleFuncs(cornerFuncs, &cornerFuncTurn, i) }
+	// cycleEdgeFuncs := func(i int) { cycleFuncs(edgeFuncs, &edgeFuncTurn, i) }
+	// cycleCornerFuncs := func(i int) { cycleFuncs(cornerFuncs, &cornerFuncTurn, i) }
+
+	leftFuncs := [][]resizeFunc{{leftHalf, leftTwoThirds, leftOneThirds}}
+	leftFuncTurn := make([]int, len(leftFuncs))
+	cycleLeftFunc := func() { cycleFuncs(leftFuncs, &leftFuncTurn, 0) }
+
+	rightFuncs := [][]resizeFunc{{rightHalf, rightTwoThirds, rightOneThirds}}
+	rightFuncTurn := make([]int, len(rightFuncs))
+	cycleRightFunc := func() { cycleFuncs(rightFuncs, &rightFuncTurn, 0) }
+
+	topFuncs := [][]resizeFunc{{topMaximize, topHalf, bottomHalf}}
+	topFuncTurn := make([]int, len(topFuncs))
+	cycleTopFunc := func() { cycleFuncs(topFuncs, &topFuncTurn, 0) }
 
 	hks := []HotKey{
-		(HotKey{id: 1, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_LEFT, callback: func() { cycleEdgeFuncs(0) }}),
-		(HotKey{id: 2, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_RIGHT, callback: func() { cycleEdgeFuncs(1) }}),
-		(HotKey{id: 3, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_UP, callback: func() { cycleEdgeFuncs(2) }}),
-		(HotKey{id: 4, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_DOWN, callback: func() { cycleEdgeFuncs(3) }}),
-		(HotKey{id: 5, mod: MOD_CONTROL | MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_LEFT, callback: func() { cycleCornerFuncs(0) }}),
-		(HotKey{id: 6, mod: MOD_CONTROL | MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_UP, callback: func() { cycleCornerFuncs(1) }}),
-		(HotKey{id: 7, mod: MOD_CONTROL | MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_DOWN, callback: func() { cycleCornerFuncs(2) }}),
-		(HotKey{id: 8, mod: MOD_CONTROL | MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_RIGHT, callback: func() { cycleCornerFuncs(3) }}),
-		(HotKey{id: 50, mod: MOD_SHIFT | MOD_WIN, vk: 0x46 /*F*/, callback: func() {
-			lastResized = 0 // cause edgeFuncTurn to be reset
-			if err := maximize(); err != nil {
-				fmt.Printf("warn: maximize: %v\n", err)
-				return
-			}
-		}}),
-		(HotKey{id: 60, mod: MOD_ALT | MOD_WIN, vk: 0x43 /*C*/, callback: func() {
-			lastResized = 0 // cause edgeFuncTurn to be reset
-			if _, err := resize(w32.GetForegroundWindow(), center); err != nil {
-				fmt.Printf("warn: resize: %v\n", err)
-				return
-			}
-		}}),
-		(HotKey{id: 70, mod: MOD_ALT | MOD_WIN, vk: 0x41 /*A*/, callback: func() {
-			hwnd := w32.GetForegroundWindow()
-			if err := toggleAlwaysOnTop(hwnd); err != nil {
-				fmt.Printf("warn: toggleAlwaysOnTop: %v\n", err)
-				return
-			}
-			fmt.Printf("> toggled always on top: %v\n", hwnd)
-		}}),
+		(HotKey{id: 1, mod: MOD_CONTROL | MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_LEFT, callback: func() { cycleLeftFunc() }}),
+		(HotKey{id: 2, mod: MOD_CONTROL | MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_RIGHT, callback: func() { cycleRightFunc() }}),
+		(HotKey{id: 3, mod: MOD_CONTROL | MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_UP, callback: func() { cycleTopFunc() }}),
+
+		// (HotKey{id: 1, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_LEFT, callback: func() { cycleEdgeFuncs(0) }}),
+		// (HotKey{id: 2, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_RIGHT, callback: func() { cycleEdgeFuncs(1) }}),
+		// (HotKey{id: 3, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_UP, callback: func() { cycleEdgeFuncs(2) }}),
+		// (HotKey{id: 4, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_DOWN, callback: func() { cycleEdgeFuncs(3) }}),
+		// (HotKey{id: 5, mod: MOD_CONTROL | MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_LEFT, callback: func() { cycleCornerFuncs(0) }}),
+		// (HotKey{id: 6, mod: MOD_CONTROL | MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_UP, callback: func() { cycleCornerFuncs(1) }}),
+		// (HotKey{id: 7, mod: MOD_CONTROL | MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_DOWN, callback: func() { cycleCornerFuncs(2) }}),
+		// (HotKey{id: 8, mod: MOD_CONTROL | MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_RIGHT, callback: func() { cycleCornerFuncs(3) }}),
+		// (HotKey{id: 50, mod: MOD_SHIFT | MOD_WIN, vk: 0x46 /*F*/, callback: func() {
+		// 	lastResized = 0 // cause edgeFuncTurn to be reset
+		// 	if err := maximize(); err != nil {
+		// 		fmt.Printf("warn: maximize: %v\n", err)
+		// 		return
+		// 	}
+		// }}),
+		// (HotKey{id: 60, mod: MOD_ALT | MOD_WIN, vk: 0x43 /*C*/, callback: func() {
+		// 	lastResized = 0 // cause edgeFuncTurn to be reset
+		// 	if _, err := resize(w32.GetForegroundWindow(), center); err != nil {
+		// 		fmt.Printf("warn: resize: %v\n", err)
+		// 		return
+		// 	}
+		// }}),
+		// (HotKey{id: 70, mod: MOD_ALT | MOD_WIN, vk: 0x41 /*A*/, callback: func() {
+		// 	hwnd := w32.GetForegroundWindow()
+		// 	if err := toggleAlwaysOnTop(hwnd); err != nil {
+		// 		fmt.Printf("warn: toggleAlwaysOnTop: %v\n", err)
+		// 		return
+		// 	}
+		// 	fmt.Printf("> toggled always on top: %v\n", hwnd)
+		// }}),
 	}
 
 	var failedHotKeys []HotKey
