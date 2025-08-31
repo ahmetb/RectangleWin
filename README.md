@@ -34,14 +34,15 @@ only using hotkeys:
   - <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>&uarr;</kbd>: top-right ½, ⅔ and ⅓
   - <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>&darr;</kbd>: bottom-left ½, ⅔ and ⅓
   - <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>&rarr;</kbd>: bottom-right ½, ⅔ and ⅓
- 
-  - 
   - <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>U</kbd>: top-left ½, ⅔ and ⅓
   - <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>I</kbd>: top-right ½, ⅔ and ⅓
   - <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>J</kbd>: bottom-left ½, ⅔ and ⅓
   - <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>K</kbd>: bottom-right ½, ⅔ and ⅓
 
 - **Center window** on the display: <kbd>Win</kbd>+<kbd>Alt</kbd>+<kbd>C</kbd>
+- **Resize window** on the display:
+  - <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>&#61;</kbd>: make current window larger
+  - <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>&#8212;</kbd>: make current window smaller
 
 - **Maximize window**: <kbd>Win</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd>
   (Obsolete since Windows natively supports <kbd>Win</kbd>+<kbd>&uarr;</kbd>)
