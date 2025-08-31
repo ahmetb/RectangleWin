@@ -40,6 +40,9 @@ only using hotkeys:
   - <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>K</kbd>: bottom-right ½, ⅔ and ⅓
 
 - **Center window** on the display: <kbd>Win</kbd>+<kbd>Alt</kbd>+<kbd>C</kbd>
+
+- **Maximize height of  window** on the display: <kbd>Win</kbd>+<kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>&uarr;</kbd>
+
 - **Resize window** on the display:
   - <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>&#61;</kbd>: make current window larger
   - <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>&#8212;</kbd>: make current window smaller
