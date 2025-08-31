@@ -91,10 +91,10 @@ func main() {
 		(HotKey{id: 6, mod: MOD_CONTROL | MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_UP, callback: func() { cycleCornerFuncs(1) }}),
 		(HotKey{id: 7, mod: MOD_CONTROL | MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_DOWN, callback: func() { cycleCornerFuncs(2) }}),
 		(HotKey{id: 8, mod: MOD_CONTROL | MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_RIGHT, callback: func() { cycleCornerFuncs(3) }}),
-		(HotKey{id: 5, mod: MOD_CONTROL | MOD_ALT | MOD_NOREPEAT, vk: 0x55 /*U*/, callback: func() { cycleCornerFuncs(0) }}),
-		(HotKey{id: 6, mod: MOD_CONTROL | MOD_ALT | MOD_NOREPEAT, vk: 0x49 /*I*/, callback: func() { cycleCornerFuncs(1) }}),
-		(HotKey{id: 7, mod: MOD_CONTROL | MOD_ALT | MOD_NOREPEAT, vk: 0x4A /*J*/, callback: func() { cycleCornerFuncs(2) }}),
-		(HotKey{id: 8, mod: MOD_CONTROL | MOD_ALT | MOD_NOREPEAT, vk: 0x4B /*K*/, callback: func() { cycleCornerFuncs(3) }}),
+		(HotKey{id: 9, mod: MOD_CONTROL | MOD_ALT | MOD_NOREPEAT, vk: 0x55 /*U*/, callback: func() { cycleCornerFuncs(0) }}),
+		(HotKey{id: 10, mod: MOD_CONTROL | MOD_ALT | MOD_NOREPEAT, vk: 0x49 /*I*/, callback: func() { cycleCornerFuncs(1) }}),
+		(HotKey{id: 11, mod: MOD_CONTROL | MOD_ALT | MOD_NOREPEAT, vk: 0x4A /*J*/, callback: func() { cycleCornerFuncs(2) }}),
+		(HotKey{id: 12, mod: MOD_CONTROL | MOD_ALT | MOD_NOREPEAT, vk: 0x4B /*K*/, callback: func() { cycleCornerFuncs(3) }}),
 		(HotKey{id: 50, mod: MOD_SHIFT | MOD_WIN, vk: 0x46 /*F*/, callback: func() {
 			lastResized = 0 // cause edgeFuncTurn to be reset
 			if err := maximize(); err != nil {
