@@ -87,14 +87,41 @@ func main() {
 		(HotKey{id: 2, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_RIGHT, callback: func() { cycleEdgeFuncs(1) }}),
 		(HotKey{id: 3, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_UP, callback: func() { cycleEdgeFuncs(2) }}),
 		(HotKey{id: 4, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_DOWN, callback: func() { cycleEdgeFuncs(3) }}),
+		// generally the same as above, except that it binds to alt-ctrl which is the default mapping of Win keyboard on Mac OS X.
+		(HotKey{id: 13, mod: MOD_ALT | MOD_CONTROL | MOD_NOREPEAT, vk: w32.VK_LEFT, callback: func() { cycleEdgeFuncs(0) }}),
+		(HotKey{id: 14, mod: MOD_ALT | MOD_CONTROL | MOD_NOREPEAT, vk: w32.VK_RIGHT, callback: func() { cycleEdgeFuncs(1) }}),
+		(HotKey{id: 15, mod: MOD_ALT | MOD_CONTROL | MOD_NOREPEAT, vk: w32.VK_UP, callback: func() { cycleEdgeFuncs(2) }}),
+		(HotKey{id: 16, mod: MOD_ALT | MOD_CONTROL | MOD_NOREPEAT, vk: w32.VK_DOWN, callback: func() { cycleEdgeFuncs(3) }}),
+		// Corner func #1
 		(HotKey{id: 5, mod: MOD_CONTROL | MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_LEFT, callback: func() { cycleCornerFuncs(0) }}),
 		(HotKey{id: 6, mod: MOD_CONTROL | MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_UP, callback: func() { cycleCornerFuncs(1) }}),
 		(HotKey{id: 7, mod: MOD_CONTROL | MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_DOWN, callback: func() { cycleCornerFuncs(2) }}),
 		(HotKey{id: 8, mod: MOD_CONTROL | MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_RIGHT, callback: func() { cycleCornerFuncs(3) }}),
+		// Corner func #2. Same as #1 except slightly different key binding.
 		(HotKey{id: 9, mod: MOD_CONTROL | MOD_ALT | MOD_NOREPEAT, vk: 0x55 /*U*/, callback: func() { cycleCornerFuncs(0) }}),
 		(HotKey{id: 10, mod: MOD_CONTROL | MOD_ALT | MOD_NOREPEAT, vk: 0x49 /*I*/, callback: func() { cycleCornerFuncs(1) }}),
 		(HotKey{id: 11, mod: MOD_CONTROL | MOD_ALT | MOD_NOREPEAT, vk: 0x4A /*J*/, callback: func() { cycleCornerFuncs(2) }}),
 		(HotKey{id: 12, mod: MOD_CONTROL | MOD_ALT | MOD_NOREPEAT, vk: 0x4B /*K*/, callback: func() { cycleCornerFuncs(3) }}),
+		// make larger/smaller
+		(HotKey{id: 18, mod: MOD_CONTROL | MOD_ALT | MOD_NOREPEAT, vk: 187 /*=*/, callback: func() { 
+			if _, err := resize(w32.GetForegroundWindow(), makeLarger); err != nil {
+			    fmt.Printf("warn: resize: %v\n", err)
+				return
+			}
+		}}),
+		(HotKey{id: 19, mod: MOD_CONTROL | MOD_ALT | MOD_NOREPEAT, vk: 189 /*-*/, callback: func() { 
+			if _, err := resize(w32.GetForegroundWindow(), makeSmaller); err != nil {
+			    fmt.Printf("warn: resize: %v\n", err)
+				return
+			}
+		}}),
+		// snap window to have max height on the screen.
+		(HotKey{id: 17, mod: MOD_CONTROL | MOD_ALT | MOD_SHIFT | MOD_NOREPEAT, vk: w32.VK_UP, callback: func() { 
+			if _, err := resize(w32.GetForegroundWindow(), maxHeight); err != nil {
+			    fmt.Printf("warn: resize: %v\n", err)
+				return
+			}
+		}}),
 		(HotKey{id: 50, mod: MOD_SHIFT | MOD_WIN, vk: 0x46 /*F*/, callback: func() {
 			lastResized = 0 // cause edgeFuncTurn to be reset
 			if err := maximize(); err != nil {
