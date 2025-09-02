@@ -29,11 +29,13 @@ import (
 	"github.com/gonutz/w32/v2"
 
 	"github.com/ahmetb/RectangleWin/w32ex"
+	"github.com/apenwarr/fixconsole"
 )
 
 var lastResized w32.HWND
 
 func main() {
+	err := fixconsole.FixConsoleIfNeeded()
 	runtime.LockOSThread() // since we bind hotkeys etc that need to dispatch their message here
 	if !w32ex.SetProcessDPIAware() {
 		panic("failed to set DPI aware")
@@ -81,47 +83,17 @@ func main() {
 
 	cycleEdgeFuncs := func(i int) { cycleFuncs(edgeFuncs, &edgeFuncTurn, i) }
 	cycleCornerFuncs := func(i int) { cycleFuncs(cornerFuncs, &cornerFuncTurn, i) }
-
+	
 	hks := []HotKey{
 		(HotKey{id: 1, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_LEFT, callback: func() { cycleEdgeFuncs(0) }}),
 		(HotKey{id: 2, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_RIGHT, callback: func() { cycleEdgeFuncs(1) }}),
 		(HotKey{id: 3, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_UP, callback: func() { cycleEdgeFuncs(2) }}),
 		(HotKey{id: 4, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_DOWN, callback: func() { cycleEdgeFuncs(3) }}),
-		// generally the same as above, except that it binds to alt-ctrl which is the default mapping of Win keyboard on Mac OS X.
-		(HotKey{id: 13, mod: MOD_ALT | MOD_CONTROL | MOD_NOREPEAT, vk: w32.VK_LEFT, callback: func() { cycleEdgeFuncs(0) }}),
-		(HotKey{id: 14, mod: MOD_ALT | MOD_CONTROL | MOD_NOREPEAT, vk: w32.VK_RIGHT, callback: func() { cycleEdgeFuncs(1) }}),
-		(HotKey{id: 15, mod: MOD_ALT | MOD_CONTROL | MOD_NOREPEAT, vk: w32.VK_UP, callback: func() { cycleEdgeFuncs(2) }}),
-		(HotKey{id: 16, mod: MOD_ALT | MOD_CONTROL | MOD_NOREPEAT, vk: w32.VK_DOWN, callback: func() { cycleEdgeFuncs(3) }}),
 		// Corner func #1
 		(HotKey{id: 5, mod: MOD_CONTROL | MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_LEFT, callback: func() { cycleCornerFuncs(0) }}),
 		(HotKey{id: 6, mod: MOD_CONTROL | MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_UP, callback: func() { cycleCornerFuncs(1) }}),
 		(HotKey{id: 7, mod: MOD_CONTROL | MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_DOWN, callback: func() { cycleCornerFuncs(2) }}),
 		(HotKey{id: 8, mod: MOD_CONTROL | MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_RIGHT, callback: func() { cycleCornerFuncs(3) }}),
-		// Corner func #2. Same as #1 except slightly different key binding.
-		(HotKey{id: 9, mod: MOD_CONTROL | MOD_ALT | MOD_NOREPEAT, vk: 0x55 /*U*/, callback: func() { cycleCornerFuncs(0) }}),
-		(HotKey{id: 10, mod: MOD_CONTROL | MOD_ALT | MOD_NOREPEAT, vk: 0x49 /*I*/, callback: func() { cycleCornerFuncs(1) }}),
-		(HotKey{id: 11, mod: MOD_CONTROL | MOD_ALT | MOD_NOREPEAT, vk: 0x4A /*J*/, callback: func() { cycleCornerFuncs(2) }}),
-		(HotKey{id: 12, mod: MOD_CONTROL | MOD_ALT | MOD_NOREPEAT, vk: 0x4B /*K*/, callback: func() { cycleCornerFuncs(3) }}),
-		// make larger/smaller
-		(HotKey{id: 18, mod: MOD_CONTROL | MOD_ALT | MOD_NOREPEAT, vk: 187 /*=*/, callback: func() { 
-			if _, err := resize(w32.GetForegroundWindow(), makeLarger); err != nil {
-			    fmt.Printf("warn: resize: %v\n", err)
-				return
-			}
-		}}),
-		(HotKey{id: 19, mod: MOD_CONTROL | MOD_ALT | MOD_NOREPEAT, vk: 189 /*-*/, callback: func() { 
-			if _, err := resize(w32.GetForegroundWindow(), makeSmaller); err != nil {
-			    fmt.Printf("warn: resize: %v\n", err)
-				return
-			}
-		}}),
-		// snap window to have max height on the screen.
-		(HotKey{id: 17, mod: MOD_CONTROL | MOD_ALT | MOD_SHIFT | MOD_NOREPEAT, vk: w32.VK_UP, callback: func() { 
-			if _, err := resize(w32.GetForegroundWindow(), maxHeight); err != nil {
-			    fmt.Printf("warn: resize: %v\n", err)
-				return
-			}
-		}}),
 		(HotKey{id: 50, mod: MOD_SHIFT | MOD_WIN, vk: 0x46 /*F*/, callback: func() {
 			lastResized = 0 // cause edgeFuncTurn to be reset
 			if err := maximize(); err != nil {
@@ -144,6 +116,108 @@ func main() {
 			}
 			fmt.Printf("> toggled always on top: %v\n", hwnd)
 		}}),
+	}
+	
+	myConfig := fetchConfiguration()
+	// start from id 200
+	id := 200
+	for _, keyBinding := range myConfig.Keybindings {
+		switch keyBinding.BindFeature {
+			case "moveToTop":
+				id += 1
+				hks = append(hks, (HotKey{
+					id: id,
+					mod: int(keyBinding.CombinedMod) | MOD_NOREPEAT,
+					vk: int(keyBinding.KeyCode),
+					callback: func() { cycleEdgeFuncs(2) }}))
+			case "moveToBottom":
+				id += 1
+				hks = append(hks, (HotKey{
+					id: id,
+					mod: int(keyBinding.CombinedMod) | MOD_NOREPEAT,
+					vk: int(keyBinding.KeyCode),
+					callback: func() { cycleEdgeFuncs(3) }}))
+			case "moveToLeft":
+				id += 1
+				hks = append(hks, (HotKey{
+					id: id,
+					mod: int(keyBinding.CombinedMod) | MOD_NOREPEAT,
+					vk: int(keyBinding.KeyCode),
+					callback: func() { cycleEdgeFuncs(0) }}))
+			case "moveToRight":
+				id += 1
+				hks = append(hks, (HotKey{
+					id: id,
+					mod: int(keyBinding.CombinedMod) | MOD_NOREPEAT,
+					vk: int(keyBinding.KeyCode),
+					callback: func() { cycleEdgeFuncs(1) }}))
+			case "moveToTopLeft":
+				id += 1
+				hks = append(hks, (HotKey{
+					id: id,
+					mod: int(keyBinding.CombinedMod) | MOD_NOREPEAT,
+					vk: int(keyBinding.KeyCode),
+					callback: func() { cycleCornerFuncs(0) }}))
+			case "moveToTopRight":
+				id += 1
+				hks = append(hks, (HotKey{
+					id: id,
+					mod: int(keyBinding.CombinedMod) | MOD_NOREPEAT,
+					vk: int(keyBinding.KeyCode),
+					callback: func() { cycleCornerFuncs(1) }}))
+			case "moveToBottomLeft":
+				id += 1
+				hks = append(hks, (HotKey{
+					id: id,
+					mod: int(keyBinding.CombinedMod) | MOD_NOREPEAT,
+					vk: int(keyBinding.KeyCode),
+					callback: func() { cycleCornerFuncs(2) }}))
+			case "moveToBottomRight":
+				id += 1
+				hks = append(hks, (HotKey{
+					id: id,
+					mod: int(keyBinding.CombinedMod) | MOD_NOREPEAT,
+					vk: int(keyBinding.KeyCode),
+					callback: func() { cycleCornerFuncs(3) }}))
+			case "makeLarger":
+				id += 1
+				hks = append(hks, (HotKey{
+					id: id,
+					mod: int(keyBinding.CombinedMod) | MOD_NOREPEAT,
+					vk: int(keyBinding.KeyCode),
+					callback: func() {
+						if _, err := resize(w32.GetForegroundWindow(), makeLarger); err != nil {
+							fmt.Printf("warn: resize: %v\n", err)
+							return
+						}
+					}}))
+			case "makeSmaller":
+				id += 1
+				hks = append(hks, (HotKey{
+					id: id,
+					mod: int(keyBinding.CombinedMod) | MOD_NOREPEAT,
+					vk: int(keyBinding.KeyCode),
+					callback: func() {
+						if _, err := resize(w32.GetForegroundWindow(), makeSmaller); err != nil {
+							fmt.Printf("warn: resize: %v\n", err)
+							return
+						}
+					}}))
+			case "makeFullHeight":
+				id += 1
+				hks = append(hks, (HotKey{
+					id: id,
+					mod: int(keyBinding.CombinedMod) | MOD_NOREPEAT,
+					vk: int(keyBinding.KeyCode),
+					callback: func() {
+						if _, err := resize(w32.GetForegroundWindow(), maxHeight); err != nil {
+							fmt.Printf("warn: resize: %v\n", err)
+							return
+						}
+					}}))
+			default:
+				continue;
+		}
 	}
 
 	var failedHotKeys []HotKey
