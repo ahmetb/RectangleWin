@@ -1,15 +1,15 @@
 package main
 
-import ("fmt"
-"errors"
-"strings"
+import (
+	"fmt"
+	"errors"
+	"strings"
 )
 import (
 	"github.com/golobby/config/v3"
 	"github.com/golobby/config/v3/pkg/feeder"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/gonutz/w32/v2"
-	"gopkg.in/yaml.v3"
 )
 
 type KeyBinding struct {
@@ -122,15 +122,6 @@ func bitwiseOr(nums []int32) int32 {
 
 func fetchConfiguration() Configuration {
 	spew.Dump(DEFAULT_CONF);
-	
-	fmt.Printf("test \n");
-	// Marshal struct to YAML
-	data, error := yaml.Marshal(&DEFAULT_CONF)
-	if error != nil {
-		panic(error)
-	}
-	fmt.Println("yaml: ")
-	fmt.Println(string(data))
 	// Create a Configuration file.
 	myConfig := Configuration{}
 	
