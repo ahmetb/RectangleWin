@@ -58,6 +58,76 @@ are not offering enough hotkey support.
 - Configurable shortcuts: I don't need these and it will likely require a pop-up
   UI, so I will probably not get to this.
 
+## Configuration
+
+Configuration could be achieved by changing `config.yaml` in the same folder.
+
+This file has the following structure:
+
+```
+keybindings:
+    - modifier:
+        - Ctrl
+        - Alt
+      key: UP_ARROW
+      bindfeature: moveToTop
+      
+    - modifier:
+        - Ctrl
+        - Alt
+      key: DOWN_ARROW
+      bindfeature: moveToBottom
+      
+```
+
+Each element of `keybindings` define a feature to bind keys.
+Here are some valid `modifier`s:
+
++  Ctrl
++  Alt
++  Shift
++  Win
+
+Here are some valid `key`:
+
+```
+/* case insensitive*/
+a
+b
+...
+c 
+
+0
+...
+9
+
+UP_ARROW
+DOWN_ARROW
+LEFT_ARROW
+RIGHT_ARROW
+
++
+"-" // This one has to be escaped
+```
+
+Here are some valid `bindfeature`s:
+
+```
+//   moveToTop
+//   moveToBottom
+//   moveToLeft
+//   moveToRight
+//   moveToTopLeft
+//   moveToTopRight
+//   moveToBottomLeft
+//   moveToBottomRight
+//   makeSmaller
+//   makeLarger
+//   makeFullHeight
+```
+
+See `conf.go` for more details.
+
 ## Development (Install from source)
 
 With Go 1.17+ installed, clone this repository and run:
