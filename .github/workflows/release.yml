@@ -20,7 +20,7 @@ jobs:
         go build -ldflags -H=windowsgui .
         mkdir build/
         move RectangleWin.exe build/RectangleWin.exe
-        move config.yaml build/RectangleWin.exe
+        move config.yaml build/config.yaml
 
     - name: Create GitHub Release
       uses: fnkr/github-action-ghr@v1
