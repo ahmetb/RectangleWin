@@ -5,7 +5,7 @@ on:
 jobs:
 
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
 
@@ -17,10 +17,10 @@ jobs:
     - name: Build
       run: | 
         go env -w GOOS=windows
-        go build -ldflags -H=windowsgui .
+        GOOS=windows go build -ldflags -H=windowsgui .
         mkdir build/
-        move RectangleWin.exe build/RectangleWin.exe
-        move config.yaml build/config.yaml
+        mv RectangleWin.exe build/RectangleWin.exe
+        mv config.yaml build/config.yaml
 
     - name: Create GitHub Release
       uses: fnkr/github-action-ghr@v1
