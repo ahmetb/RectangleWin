@@ -23,7 +23,7 @@ jobs:
         move config.yaml build/RectangleWin.exe
 
     - name: Create GitHub Release
-        uses: fnkr/github-action-ghr@v1.3
+        uses: fnkr/github-action-ghr@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GHR_PATH: build/
