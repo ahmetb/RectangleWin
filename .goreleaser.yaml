@@ -1,23 +1,9 @@
-project_name: RectangleWin
+version: 2
 
 builds:
-  - id: windows_build
+  - id: win
     goos:
       - windows
-    goarch:
-      - 386
-      - amd64
     ldflags:
       - -H=windowsgui
-    env:
-      - CGO_ENABLED=0
-
-archives:
-  - id: default
-    builds:
-      - windows_build
-    format: binary
-    name_template: "{{ .ProjectName }}-{{ .Arch }}-v{{ .Version }}"
-    replacements:
-      386: x86
-      amd64: x64
+    binary: "{{ .ProjectName }}-{{- if eq .Arch \"386\" }}x86{{ else if eq .Arch \"amd64\" }}x64{{ else }}{{ .Arch }}{{ end }}-v{{ .Version }}"
