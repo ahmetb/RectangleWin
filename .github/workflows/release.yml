@@ -1,6 +1,10 @@
 name: Release
 on:
   workflow_dispatch: 
+    inputs:
+      tag:
+        description: "Tag name for the release (e.g. v1.0.0)"
+        required: true
 
 jobs:
 
@@ -28,3 +32,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GHR_PATH: build/
           GHR_COMPRESS: zip
+          GITHUB_REF: refs/tags/${{ github.event.inputs.tag }}
