@@ -141,7 +141,7 @@ func fetchConfiguration() Configuration {
 		return DEFAULT_CONF
 	}
 
-	for i, _ := range myConfig.Keybindings {
+	for i := range myConfig.Keybindings {
 		if len(myConfig.Keybindings[i].ModifierCode) == 0 {
 			for _, mod := range myConfig.Keybindings[i].Modifier {
 				if modCode, err := convertModifier(mod); err == nil {
