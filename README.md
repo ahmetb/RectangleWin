@@ -27,6 +27,7 @@ only using hotkeys:
 
 - **Snap to edges** (left/right/top/bottom ½, ⅔, ⅓):
   - <kbd>Win</kbd> + <kbd>Alt</kbd> + <kbd>&larr;</kbd><kbd>&rarr;</kbd><kbd>&uarr;</kbd><kbd>&darr;</kbd>
+  - When used with `config.yaml` only: <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>&larr;</kbd><kbd>&rarr;</kbd><kbd>&uarr;</kbd><kbd>&darr;</kbd>
   - Press multiple times to alternate between ½, ⅔ and ⅓.
 
 - **Corner snapping**
@@ -34,6 +35,12 @@ only using hotkeys:
   - <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>&uarr;</kbd>: top-right ½, ⅔ and ⅓
   - <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>&darr;</kbd>: bottom-left ½, ⅔ and ⅓
   - <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>&rarr;</kbd>: bottom-right ½, ⅔ and ⅓
+  
+  The following are also available if you use the attached `config.yaml`:
+  - <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>U</kbd>: top-left ½, ⅔ and ⅓
+  - <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>I</kbd>: top-right ½, ⅔ and ⅓
+  - <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>J</kbd>: bottom-left ½, ⅔ and ⅓
+  - <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>K</kbd>: bottom-right ½, ⅔ and ⅓
 
 - **Center window** on the display: <kbd>Win</kbd>+<kbd>Alt</kbd>+<kbd>C</kbd>
 
@@ -41,6 +48,9 @@ only using hotkeys:
   (Obsolete since Windows natively supports <kbd>Win</kbd>+<kbd>&uarr;</kbd>)
 
 - **Always On Top (toggle)**: <kbd>Win</kbd>+<kbd>Alt</kbd>+<kbd>A</kbd>
+
+The following are also available if you use the attached `config.yaml`:
+  - <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>&uarr;</kbd>: maximize window height.
 
 ## Why?
 
