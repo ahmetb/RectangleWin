@@ -83,7 +83,7 @@ func main() {
 
 	cycleEdgeFuncs := func(i int) { cycleFuncs(edgeFuncs, &edgeFuncTurn, i) }
 	cycleCornerFuncs := func(i int) { cycleFuncs(cornerFuncs, &cornerFuncTurn, i) }
-	
+
 	hks := []HotKey{
 		(HotKey{id: 1, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_LEFT, callback: func() { cycleEdgeFuncs(0) }}),
 		(HotKey{id: 2, mod: MOD_ALT | MOD_WIN | MOD_NOREPEAT, vk: w32.VK_RIGHT, callback: func() { cycleEdgeFuncs(1) }}),
@@ -117,106 +117,106 @@ func main() {
 			fmt.Printf("> toggled always on top: %v\n", hwnd)
 		}}),
 	}
-	
+
 	myConfig := fetchConfiguration()
 	// start from id 200
 	id := 200
 	for _, keyBinding := range myConfig.Keybindings {
 		switch keyBinding.BindFeature {
-			case "moveToTop":
-				id += 1
-				hks = append(hks, (HotKey{
-					id: id,
-					mod: int(keyBinding.CombinedMod) | MOD_NOREPEAT,
-					vk: int(keyBinding.KeyCode),
-					callback: func() { cycleEdgeFuncs(2) }}))
-			case "moveToBottom":
-				id += 1
-				hks = append(hks, (HotKey{
-					id: id,
-					mod: int(keyBinding.CombinedMod) | MOD_NOREPEAT,
-					vk: int(keyBinding.KeyCode),
-					callback: func() { cycleEdgeFuncs(3) }}))
-			case "moveToLeft":
-				id += 1
-				hks = append(hks, (HotKey{
-					id: id,
-					mod: int(keyBinding.CombinedMod) | MOD_NOREPEAT,
-					vk: int(keyBinding.KeyCode),
-					callback: func() { cycleEdgeFuncs(0) }}))
-			case "moveToRight":
-				id += 1
-				hks = append(hks, (HotKey{
-					id: id,
-					mod: int(keyBinding.CombinedMod) | MOD_NOREPEAT,
-					vk: int(keyBinding.KeyCode),
-					callback: func() { cycleEdgeFuncs(1) }}))
-			case "moveToTopLeft":
-				id += 1
-				hks = append(hks, (HotKey{
-					id: id,
-					mod: int(keyBinding.CombinedMod) | MOD_NOREPEAT,
-					vk: int(keyBinding.KeyCode),
-					callback: func() { cycleCornerFuncs(0) }}))
-			case "moveToTopRight":
-				id += 1
-				hks = append(hks, (HotKey{
-					id: id,
-					mod: int(keyBinding.CombinedMod) | MOD_NOREPEAT,
-					vk: int(keyBinding.KeyCode),
-					callback: func() { cycleCornerFuncs(1) }}))
-			case "moveToBottomLeft":
-				id += 1
-				hks = append(hks, (HotKey{
-					id: id,
-					mod: int(keyBinding.CombinedMod) | MOD_NOREPEAT,
-					vk: int(keyBinding.KeyCode),
-					callback: func() { cycleCornerFuncs(2) }}))
-			case "moveToBottomRight":
-				id += 1
-				hks = append(hks, (HotKey{
-					id: id,
-					mod: int(keyBinding.CombinedMod) | MOD_NOREPEAT,
-					vk: int(keyBinding.KeyCode),
-					callback: func() { cycleCornerFuncs(3) }}))
-			case "makeLarger":
-				id += 1
-				hks = append(hks, (HotKey{
-					id: id,
-					mod: int(keyBinding.CombinedMod) | MOD_NOREPEAT,
-					vk: int(keyBinding.KeyCode),
-					callback: func() {
-						if _, err := resize(w32.GetForegroundWindow(), makeLarger); err != nil {
-							fmt.Printf("warn: resize: %v\n", err)
-							return
-						}
-					}}))
-			case "makeSmaller":
-				id += 1
-				hks = append(hks, (HotKey{
-					id: id,
-					mod: int(keyBinding.CombinedMod) | MOD_NOREPEAT,
-					vk: int(keyBinding.KeyCode),
-					callback: func() {
-						if _, err := resize(w32.GetForegroundWindow(), makeSmaller); err != nil {
-							fmt.Printf("warn: resize: %v\n", err)
-							return
-						}
-					}}))
-			case "makeFullHeight":
-				id += 1
-				hks = append(hks, (HotKey{
-					id: id,
-					mod: int(keyBinding.CombinedMod) | MOD_NOREPEAT,
-					vk: int(keyBinding.KeyCode),
-					callback: func() {
-						if _, err := resize(w32.GetForegroundWindow(), maxHeight); err != nil {
-							fmt.Printf("warn: resize: %v\n", err)
-							return
-						}
-					}}))
-			default:
-				continue;
+		case "moveToTop":
+			id += 1
+			hks = append(hks, (HotKey{
+				id:       id,
+				mod:      int(keyBinding.CombinedMod) | MOD_NOREPEAT,
+				vk:       int(keyBinding.KeyCode),
+				callback: func() { cycleEdgeFuncs(2) }}))
+		case "moveToBottom":
+			id += 1
+			hks = append(hks, (HotKey{
+				id:       id,
+				mod:      int(keyBinding.CombinedMod) | MOD_NOREPEAT,
+				vk:       int(keyBinding.KeyCode),
+				callback: func() { cycleEdgeFuncs(3) }}))
+		case "moveToLeft":
+			id += 1
+			hks = append(hks, (HotKey{
+				id:       id,
+				mod:      int(keyBinding.CombinedMod) | MOD_NOREPEAT,
+				vk:       int(keyBinding.KeyCode),
+				callback: func() { cycleEdgeFuncs(0) }}))
+		case "moveToRight":
+			id += 1
+			hks = append(hks, (HotKey{
+				id:       id,
+				mod:      int(keyBinding.CombinedMod) | MOD_NOREPEAT,
+				vk:       int(keyBinding.KeyCode),
+				callback: func() { cycleEdgeFuncs(1) }}))
+		case "moveToTopLeft":
+			id += 1
+			hks = append(hks, (HotKey{
+				id:       id,
+				mod:      int(keyBinding.CombinedMod) | MOD_NOREPEAT,
+				vk:       int(keyBinding.KeyCode),
+				callback: func() { cycleCornerFuncs(0) }}))
+		case "moveToTopRight":
+			id += 1
+			hks = append(hks, (HotKey{
+				id:       id,
+				mod:      int(keyBinding.CombinedMod) | MOD_NOREPEAT,
+				vk:       int(keyBinding.KeyCode),
+				callback: func() { cycleCornerFuncs(1) }}))
+		case "moveToBottomLeft":
+			id += 1
+			hks = append(hks, (HotKey{
+				id:       id,
+				mod:      int(keyBinding.CombinedMod) | MOD_NOREPEAT,
+				vk:       int(keyBinding.KeyCode),
+				callback: func() { cycleCornerFuncs(2) }}))
+		case "moveToBottomRight":
+			id += 1
+			hks = append(hks, (HotKey{
+				id:       id,
+				mod:      int(keyBinding.CombinedMod) | MOD_NOREPEAT,
+				vk:       int(keyBinding.KeyCode),
+				callback: func() { cycleCornerFuncs(3) }}))
+		case "makeLarger":
+			id += 1
+			hks = append(hks, (HotKey{
+				id:  id,
+				mod: int(keyBinding.CombinedMod) | MOD_NOREPEAT,
+				vk:  int(keyBinding.KeyCode),
+				callback: func() {
+					if _, err := resize(w32.GetForegroundWindow(), makeLarger); err != nil {
+						fmt.Printf("warn: resize: %v\n", err)
+						return
+					}
+				}}))
+		case "makeSmaller":
+			id += 1
+			hks = append(hks, (HotKey{
+				id:  id,
+				mod: int(keyBinding.CombinedMod) | MOD_NOREPEAT,
+				vk:  int(keyBinding.KeyCode),
+				callback: func() {
+					if _, err := resize(w32.GetForegroundWindow(), makeSmaller); err != nil {
+						fmt.Printf("warn: resize: %v\n", err)
+						return
+					}
+				}}))
+		case "makeFullHeight":
+			id += 1
+			hks = append(hks, (HotKey{
+				id:  id,
+				mod: int(keyBinding.CombinedMod) | MOD_NOREPEAT,
+				vk:  int(keyBinding.KeyCode),
+				callback: func() {
+					if _, err := resize(w32.GetForegroundWindow(), maxHeight); err != nil {
+						fmt.Printf("warn: resize: %v\n", err)
+						return
+					}
+				}}))
+		default:
+			continue
 		}
 	}
 
