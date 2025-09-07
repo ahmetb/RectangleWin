@@ -29,4 +29,3 @@ jobs:
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GHR_PATH: build/
-          GHR_COMPRESS: zip
