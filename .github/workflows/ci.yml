@@ -23,15 +23,15 @@ jobs:
     - name: Checkout
       uses: actions/checkout@master
     - name: Setup Go
-      uses: actions/setup-go@v2
+      uses: actions/setup-go@v4
       with:
-        go-version: 1.17
+        go-version: "1.20"
     - id: go-cache-paths
       run: |
-        echo "::set-output name=go-build::$(go env GOCACHE)"
-        echo "::set-output name=go-mod::$(go env GOMODCACHE)"
+        echo "go-build=$(go env GOCACHE)" >> $GITHUB_OUTPUT
+        echo "go-mod=$(go env GOMODCACHE)" >> $GITHUB_OUTPUT
     - name: go build cache
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         key: ${{ runner.os }}-go-build-${{ hashFiles('**/go.sum') }}
         path: |
@@ -48,14 +48,17 @@ jobs:
       uses: goreleaser/goreleaser-action@v2
       with:
         distribution: goreleaser
-        version: latest
-        args: release --snapshot --skip-publish --rm-dist
+        version: v2.12.0
+        args: release --snapshot
+      env:
+        GORELEASER_SKIP_PUBLISH: true
     - name: Publish release (GoReleaser)
       if: startsWith(github.ref, 'refs/tags/')
       uses: goreleaser/goreleaser-action@v2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GORELEASER_SKIP_PUBLISH: true
       with:
         distribution: goreleaser
-        version: latest
-        args: release --rm-dist
+        version: v2.12.0
+        args: release
