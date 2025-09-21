@@ -1,11 +1,9 @@
+version: 2
+
 builds:
-  - goos:
+  - id: win
+    goos:
       - windows
     ldflags:
       - -H=windowsgui
-archives:
-- format: binary
-  name_template: "{{ .ProjectName }}-{{ .Arch }}-v{{.Version}}"
-  replacements:
-    386: x86
-    amd64: x64
+    binary: "{{ .ProjectName }}-{{- if eq .Arch \"386\" }}x86{{ else if eq .Arch \"amd64\" }}x64{{ else }}{{ .Arch }}{{ end }}-v{{ .Version }}"
