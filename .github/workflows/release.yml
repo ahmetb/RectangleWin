@@ -22,7 +22,6 @@ jobs:
         GOOS=windows go build -ldflags -H=windowsgui .
         mkdir build/
         mv RectangleWin.exe build/RectangleWin.exe
-        mv config.yaml build/config.yaml
 
     - name: Create GitHub Release
       uses: fnkr/github-action-ghr@v1
