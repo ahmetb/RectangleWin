@@ -1,3 +1,5 @@
+# This is a sample config file for RectangleWin.
+# See conf.go for details.
 keybindings:
     - modifier:
         - Ctrl
