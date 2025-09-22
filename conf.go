@@ -1,8 +1,12 @@
 package main
 
 import (
+	_ "embed"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"strings"
 )
 import (
@@ -49,6 +53,9 @@ type Configuration struct {
 	Keybindings []KeyBinding `yaml: "key_binding"`
 }
 
+// This mini config is returned if we can't load a valid file
+// and cannot write the detailed example yaml config.example.yaml
+// into the expected path at %HOME%
 var DEFAULT_CONF = Configuration{
 	Keybindings: []KeyBinding{
 		{
@@ -60,6 +67,11 @@ var DEFAULT_CONF = Configuration{
 	},
 }
 
+//go:embed config.example.yaml
+var configExampleYaml []byte
+
+// Expected config path at %HOME%/.config/RectangleWin/config.yaml
+var DEFAULT_CONF_PATH_PREFIX = ".config/RectangleWin/"
 var DEFAULT_CONF_NAME = "config.yaml"
 
 func convertModifier(keyName string) (int32, error) {
@@ -119,20 +131,55 @@ func bitwiseOr(nums []int32) int32 {
 	return result
 }
 
+func getValidConfigPathOrCreate() string {
+	homeDir := os.Getenv("HOME")
+	if homeDir == "" {
+		homeDir = os.Getenv("USERPROFILE")
+	}
+	if homeDir == "" {
+		// Give up generating a valid path.
+		// read or write the conf in current folder.
+		return DEFAULT_CONF_NAME
+	}
+	configDir := filepath.Join(homeDir, DEFAULT_CONF_PATH_PREFIX)
+	err := os.MkdirAll(configDir, 0755)
+	if err != nil {
+		fmt.Printf("Error creating directory under user's home folder: %s", err)
+		// read or write the conf in current folder
+		return DEFAULT_CONF_NAME
+	}
+	configPath := filepath.Join(configDir, DEFAULT_CONF_NAME)
+	return configPath
+}
+
+func maybeDropExampleConfigFile(target string) {
+	// Check if the file exists, if not, create it with some content
+	if _, err := os.Stat(target); os.IsNotExist(err) {
+		// Create the file and write the sample content
+		err := ioutil.WriteFile(target, configExampleYaml, 0644)
+		if err != nil {
+			fmt.Println("Failed to create file created: %s %v", target, err)
+		}
+		fmt.Println("File created: %s", target)
+	}
+}
+
 func fetchConfiguration() Configuration {
 	spew.Dump(DEFAULT_CONF)
 	// Create a Configuration file.
 	myConfig := Configuration{}
 
 	// Yaml feeder
-	yamlFeeder := feeder.Yaml{Path: DEFAULT_CONF_NAME}
+	configFilePath := getValidConfigPathOrCreate()
+	maybeDropExampleConfigFile(configFilePath)
+	yamlFeeder := feeder.Yaml{Path: configFilePath}
 	c := config.New()
 	c.AddFeeder(yamlFeeder)
 	c.AddStruct(&myConfig)
 
 	err := c.Feed()
 	if err != nil {
-		fmt.Printf("warn: invalid config files found: %s %v\n", DEFAULT_CONF_NAME, err)
+		fmt.Printf("warn: invalid config files found: %s %v\n", configFilePath, err)
 		return DEFAULT_CONF
 	}
 
