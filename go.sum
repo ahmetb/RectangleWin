@@ -1,5 +1,3 @@
-github.com/BurntSushi/toml v1.2.1 h1:9F2/+DoOYIOksmaJFPw1tGFy1eDnIJXg+UHjuD8lTak=
-github.com/BurntSushi/toml v1.2.1/go.mod h1:CxXYINrC8qIiEnFrOxCa7Jy5BFHlXnUU2pbicEuybxQ=
 github.com/apenwarr/fixconsole v0.0.0-20191012055117-5a9f6489cc29 h1:muXWUcay7DDy1/hEQWrYlBy+g0EuwT70sBHg65SeUc4=
 github.com/apenwarr/fixconsole v0.0.0-20191012055117-5a9f6489cc29/go.mod h1:JYWahgHer+Z2xbsgHPtaDYVWzeHDminu+YIBWkxpCAY=
 github.com/apenwarr/w32 v0.0.0-20190407065021-aa00fece76ab h1:CMGzRRCjnD50RjUFSArBLuCxiDvdp7b8YPAcikBEQ+k=
@@ -24,14 +22,6 @@ github.com/getlantern/systray v1.1.0 h1:U0wCEqseLi2ok1fE6b88gJklzriavPJixZysZPkZ
 github.com/getlantern/systray v1.1.0/go.mod h1:AecygODWIsBquJCJFop8MEQcJbWFfw/1yWbVabNgpCM=
 github.com/go-stack/stack v1.8.0 h1:5SgMzNM5HxrEjV0ww2lTmX6E2Izsfxas4+YHWRs3Lsk=
 github.com/go-stack/stack v1.8.0/go.mod h1:v0f6uXyyMGvRgIKkXu+yp6POWl0qKG85gN/melR3HDY=
-github.com/golobby/cast v1.3.3 h1:s2Lawb9RMz7YyYf8IrfMQY4IFmA1R/lgfmj97Vc6fig=
-github.com/golobby/cast v1.3.3/go.mod h1:0oDO5IT84HTXcbLDf1YXuk0xtg/cRDrxhbpWKxwtJCY=
-github.com/golobby/config/v3 v3.4.2 h1:oIOSo24mC0A8f93ZTL24NDNw0hZ3Tbb34wc1ckn2CsA=
-github.com/golobby/config/v3 v3.4.2/go.mod h1:3go9UVPb3bBNrH7qidd4vd1HbsAAwIYqcQJgGmAa044=
-github.com/golobby/dotenv v1.3.2 h1:9vA8XqXXIB3cX/5xQ1CTbOCPegioHtHXIxeFng+uOqQ=
-github.com/golobby/dotenv v1.3.2/go.mod h1:9MMVXqzLNluhVxCv3X/DLYBNUb289f05tr+df1+7278=
-github.com/golobby/env/v2 v2.2.4 h1:sjdTe+bScPRWUIA1AQH95RHv52jM5Mns2XHwLyEbkzk=
-github.com/golobby/env/v2 v2.2.4/go.mod h1:HDJW+dHHwLxkb8FZMjBTBiZUFl1iAA4F9YX15kBC84c=
 github.com/gonutz/w32/v2 v2.2.2 h1:y6Y337TpuCXjYdFTq5p5NmcujEdAQiTB43kisovMk+0=
 github.com/gonutz/w32/v2 v2.2.2/go.mod h1:MgtHx0AScDVNKyB+kjyPder4xIi3XAcHS6LDDU2DmdE=
 github.com/kr/pretty v0.2.1/go.mod h1:ipq/a2n7PKx3OHsz4KJII5eveXtPO4qwEXGdVfWzfnI=

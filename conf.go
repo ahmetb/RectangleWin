@@ -10,10 +10,8 @@ import (
 	"strings"
 )
 import (
-	"github.com/davecgh/go-spew/spew"
-	"github.com/golobby/config/v3"
-	"github.com/golobby/config/v3/pkg/feeder"
 	"github.com/gonutz/w32/v2"
+	"gopkg.in/yaml.v3"
 )
 
 type KeyBinding struct {
@@ -87,7 +85,7 @@ func convertModifier(keyName string) (int32, error) {
 	case "super":
 		return MOD_WIN, nil
 	default:
-		return 0, errors.New("invalid keyname")
+		return 0, fmt.Errorf("invalid keyname: %s", keyName)
 	}
 	return 0, errors.New("unreachable")
 }
@@ -116,7 +114,7 @@ func convertKeyCode(key string) (int32, error) {
 	case "=":
 		return 187, nil
 	default:
-		return 0, errors.New("Unknown key")
+		return 0, fmt.Errorf("Unknown key %s", key)
 	}
 }
 
@@ -146,7 +144,7 @@ func getValidConfigPathOrCreate() (string, error) {
 	if err != nil {
 		fmt.Printf("Error creating directory under user's home folder: %s", err)
 		// read or write the conf in current folder
-		return DEFAULT_CONF_NAME, errors.New("Failed to create folders under user's home directory")
+		return DEFAULT_CONF_NAME, fmt.Errorf("Failed to create folders under user's home directory: %s", configDir)
 	}
 	configPath := filepath.Join(configDir, DEFAULT_CONF_NAME)
 	return configPath, nil
@@ -165,7 +163,6 @@ func maybeDropExampleConfigFile(target string) {
 }
 
 func fetchConfiguration() Configuration {
-	spew.Dump(DEFAULT_CONF)
 	// Create a Configuration file.
 	myConfig := Configuration{}
 
@@ -174,14 +171,15 @@ func fetchConfiguration() Configuration {
 	if err == nil {
 		maybeDropExampleConfigFile(configFilePath)
 	}
-	yamlFeeder := feeder.Yaml{Path: configFilePath}
-	c := config.New()
-	c.AddFeeder(yamlFeeder)
-	c.AddStruct(&myConfig)
-
-	err = c.Feed()
+	data, err := os.ReadFile(configFilePath)
 	if err != nil {
-		fmt.Printf("warn: invalid config files found: %s %v\n", configFilePath, err)
+		fmt.Printf("Failed to load config file at expected path %s\n", configFilePath)
+		// use the last-ditch config
+		return DEFAULT_CONF
+	}
+
+	if err := yaml.Unmarshal(data, &myConfig); err != nil {
+		showMessageBox("Failed to parse config file at %s.\n")
 		return DEFAULT_CONF
 	}
 
@@ -206,6 +204,5 @@ func fetchConfiguration() Configuration {
 			}
 		}
 	}
-	spew.Dump(myConfig)
 	return myConfig
 }
