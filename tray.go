@@ -82,10 +82,14 @@ func onReady() {
 	go func() {
 		<-mConfig.ClickedCh
 		fmt.Println("opening editor for default config")
-		configFilePath := getValidConfigPathOrCreate()
-		maybeDropExampleConfigFile(configFilePath)
+		configFilePath, err := getValidConfigPathOrCreate()
+		if err != nil {
+			showMessageBox(fmt.Sprintf(
+				"Can't locate config path under user home directory %s\n%v", configFilePath, err))
+			return
+		}
 		cmd := exec.Command("notepad.exe", configFilePath)
-		err := cmd.Start()
+		err = cmd.Start()
 		if err != nil {
 			showMessageBox(fmt.Sprintf("Failed to open config file %s\n%v", configFilePath, err))
 		}

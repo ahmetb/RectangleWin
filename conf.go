@@ -131,7 +131,7 @@ func bitwiseOr(nums []int32) int32 {
 	return result
 }
 
-func getValidConfigPathOrCreate() string {
+func getValidConfigPathOrCreate() (string, error) {
 	homeDir := os.Getenv("HOME")
 	if homeDir == "" {
 		homeDir = os.Getenv("USERPROFILE")
@@ -139,17 +139,17 @@ func getValidConfigPathOrCreate() string {
 	if homeDir == "" {
 		// Give up generating a valid path.
 		// read or write the conf in current folder.
-		return DEFAULT_CONF_NAME
+		return DEFAULT_CONF_NAME, errors.New("Failed to find user home directory")
 	}
-	configDir := filepath.Join(homeDir, DEFAULT_CONF_PATH_PREFIX)
+	configDir := filepath.Join(homeDir, filepath.FromSlash(DEFAULT_CONF_PATH_PREFIX))
 	err := os.MkdirAll(configDir, 0755)
 	if err != nil {
 		fmt.Printf("Error creating directory under user's home folder: %s", err)
 		// read or write the conf in current folder
-		return DEFAULT_CONF_NAME
+		return DEFAULT_CONF_NAME, errors.New("Failed to create folders under user's home directory")
 	}
 	configPath := filepath.Join(configDir, DEFAULT_CONF_NAME)
-	return configPath
+	return configPath, nil
 }
 
 func maybeDropExampleConfigFile(target string) {
@@ -170,14 +170,16 @@ func fetchConfiguration() Configuration {
 	myConfig := Configuration{}
 
 	// Yaml feeder
-	configFilePath := getValidConfigPathOrCreate()
-	maybeDropExampleConfigFile(configFilePath)
+	configFilePath, err := getValidConfigPathOrCreate()
+	if err == nil {
+		maybeDropExampleConfigFile(configFilePath)
+	}
 	yamlFeeder := feeder.Yaml{Path: configFilePath}
 	c := config.New()
 	c.AddFeeder(yamlFeeder)
 	c.AddStruct(&myConfig)
 
-	err := c.Feed()
+	err = c.Feed()
 	if err != nil {
 		fmt.Printf("warn: invalid config files found: %s %v\n", configFilePath, err)
 		return DEFAULT_CONF
