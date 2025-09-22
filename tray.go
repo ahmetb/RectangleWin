@@ -17,9 +17,9 @@ package main
 import (
 	_ "embed"
 	"fmt"
-
 	"github.com/getlantern/systray"
 	"github.com/gonutz/w32/v2"
+	"os/exec"
 )
 
 //go:embed assets/tray_icon.ico
@@ -74,6 +74,25 @@ func onReady() {
 			}
 
 		}
+	}()
+
+	systray.AddSeparator()
+
+	mConfig := systray.AddMenuItem("Configuration", "")
+	go func() {
+		<-mConfig.ClickedCh
+		fmt.Println("opening editor for default config")
+		configFilePath := getValidConfigPathOrCreate()
+		maybeDropExampleConfigFile(configFilePath)
+		cmd := exec.Command("notepad.exe", configFilePath)
+		err := cmd.Start()
+		if err != nil {
+			showMessageBox(fmt.Sprintf("Failed to open config file %s\n%v", configFilePath, err))
+		}
+		// TODO add a better way to reload current program.
+		// Reloading programmatically is non-trivial because this program registers
+		// hotkeys, so it much synchronize to start the child process, but quit
+		// parent before the child starts to register hotkeys
 	}()
 
 	systray.AddSeparator()
