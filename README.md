@@ -27,7 +27,6 @@ only using hotkeys:
 
 - **Snap to edges** (left/right/top/bottom ½, ⅔, ⅓):
   - <kbd>Win</kbd> + <kbd>Alt</kbd> + <kbd>&larr;</kbd><kbd>&rarr;</kbd><kbd>&uarr;</kbd><kbd>&darr;</kbd>
-  - When used with `config.yaml` only: <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>&larr;</kbd><kbd>&rarr;</kbd><kbd>&uarr;</kbd><kbd>&darr;</kbd>
   - Press multiple times to alternate between ½, ⅔ and ⅓.
 
 - **Corner snapping**
@@ -35,12 +34,6 @@ only using hotkeys:
   - <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>&uarr;</kbd>: top-right ½, ⅔ and ⅓
   - <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>&darr;</kbd>: bottom-left ½, ⅔ and ⅓
   - <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>&rarr;</kbd>: bottom-right ½, ⅔ and ⅓
-  
-  The following are also available if you use the attached `config.yaml`:
-  - <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>U</kbd>: top-left ½, ⅔ and ⅓
-  - <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>I</kbd>: top-right ½, ⅔ and ⅓
-  - <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>J</kbd>: bottom-left ½, ⅔ and ⅓
-  - <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>K</kbd>: bottom-right ½, ⅔ and ⅓
 
 - **Center window** on the display: <kbd>Win</kbd>+<kbd>Alt</kbd>+<kbd>C</kbd>
 
@@ -137,6 +130,18 @@ Here are some valid `bindfeature`s:
 ```
 
 See `conf.go` for more details.
+
+The `config.example.yaml` contains an example. In addition, this YAML makes the following hotkey assignments
+available:
+  - <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>&larr;</kbd>: snap to left half
+  - <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>&rarr;</kbd>: snap to right half
+  - <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>&uarr;</kbd>: snap to upper half
+  - <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>&darr;</kbd>: snap to bottom half
+
+  - <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>U</kbd>: top-left ½, ⅔ and ⅓
+  - <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>I</kbd>: top-right ½, ⅔ and ⅓
+  - <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>J</kbd>: bottom-left ½, ⅔ and ⅓
+  - <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>K</kbd>: bottom-right ½, ⅔ and ⅓
 
 ## Development (Install from source)
 
