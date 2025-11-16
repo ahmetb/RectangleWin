@@ -70,6 +70,36 @@ func topLeftHalf(disp, _ w32.RECT) w32.RECT      { return merge(toLeft(disp, 1, 
 func topLeftTwoThirds(disp, _ w32.RECT) w32.RECT { return merge(toLeft(disp, 2, 3), toTop(disp, 1, 2)) }
 func topLeftOneThirds(disp, _ w32.RECT) w32.RECT { return merge(toLeft(disp, 1, 3), toTop(disp, 1, 2)) }
 
+func maxHeight(disp, cur w32.RECT) w32.RECT {
+	return w32.RECT{Left: cur.Left, Right: cur.Right, Top: disp.Top, Bottom: disp.Bottom}
+}
+func min(a, b int32) int32 {
+	if a < b {
+		return a
+	}
+	return b
+}
+func max(a, b int32) int32 {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+// sign = 1 for positive. sign = -1 for negative.
+func resizeByPercent(disp, cur w32.RECT, sign int32) w32.RECT {
+	delta_x := (disp.Left - disp.Right) * sign / 20
+	delta_y := (disp.Top - disp.Bottom) * sign / 20
+
+	return w32.RECT{
+		Left:   max(disp.Left, cur.Left+delta_x),
+		Right:  min(disp.Right, cur.Right-delta_x),
+		Top:    max(disp.Top, cur.Top+delta_y),
+		Bottom: min(disp.Bottom, cur.Bottom-delta_y)}
+}
+func makeLarger(disp, cur w32.RECT) w32.RECT  { return resizeByPercent(disp, cur, 1) }
+func makeSmaller(disp, cur w32.RECT) w32.RECT { return resizeByPercent(disp, cur, -1) }
+
 func topRightHalf(disp, _ w32.RECT) w32.RECT { return merge(toRight(disp, 1, 2), toTop(disp, 1, 2)) }
 func topRightTwoThirds(disp, _ w32.RECT) w32.RECT {
 	return merge(toRight(disp, 2, 3), toTop(disp, 1, 2))

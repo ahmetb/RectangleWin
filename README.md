@@ -42,6 +42,9 @@ only using hotkeys:
 
 - **Always On Top (toggle)**: <kbd>Win</kbd>+<kbd>Alt</kbd>+<kbd>A</kbd>
 
+The following are also available if you use the attached `config.yaml`:
+  - <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>&uarr;</kbd>: maximize window height.
+
 ## Why?
 
 It seems that no window snapping utility for Windows is capable of letting
@@ -57,6 +60,88 @@ are not offering enough hotkey support.
 
 - Configurable shortcuts: I don't need these and it will likely require a pop-up
   UI, so I will probably not get to this.
+
+## Configuration
+
+Configuration could be achieved by changing `config.yaml` in the same folder.
+
+This file has the following structure:
+
+```
+keybindings:
+    - modifier:
+        - Ctrl
+        - Alt
+      key: UP_ARROW
+      bindfeature: moveToTop
+      
+    - modifier:
+        - Ctrl
+        - Alt
+      key: DOWN_ARROW
+      bindfeature: moveToBottom
+      
+```
+
+Each element of `keybindings` define a feature to bind keys.
+Here are some valid `modifier`s:
+
++  Ctrl
++  Alt
++  Shift
++  Win
+
+Here are some valid `key`:
+
+```
+/* case insensitive*/
+a
+b
+...
+c 
+
+0
+...
+9
+
+UP_ARROW
+DOWN_ARROW
+LEFT_ARROW
+RIGHT_ARROW
+
++
+"-" // This one has to be escaped
+```
+
+Here are some valid `bindfeature`s:
+
+```
+//   moveToTop
+//   moveToBottom
+//   moveToLeft
+//   moveToRight
+//   moveToTopLeft
+//   moveToTopRight
+//   moveToBottomLeft
+//   moveToBottomRight
+//   makeSmaller
+//   makeLarger
+//   makeFullHeight
+```
+
+See `conf.go` for more details.
+
+The `config.example.yaml` contains an example. In addition, this YAML makes the following hotkey assignments
+available:
+  - <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>&larr;</kbd>: snap to left half
+  - <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>&rarr;</kbd>: snap to right half
+  - <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>&uarr;</kbd>: snap to upper half
+  - <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>&darr;</kbd>: snap to bottom half
+
+  - <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>U</kbd>: top-left ½, ⅔ and ⅓
+  - <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>I</kbd>: top-right ½, ⅔ and ⅓
+  - <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>J</kbd>: bottom-left ½, ⅔ and ⅓
+  - <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>K</kbd>: bottom-right ½, ⅔ and ⅓
 
 ## Development (Install from source)
 
